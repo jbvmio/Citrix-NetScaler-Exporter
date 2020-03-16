@@ -13,10 +13,7 @@ var (
 			Name: "cs_virtual_servers_state",
 			Help: "Current state of the server",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersTotalHits = prometheus.NewCounterVec(
@@ -24,10 +21,7 @@ var (
 			Name: "cs_virtual_servers_total_hits",
 			Help: "Total virtual server hits",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersTotalRequests = prometheus.NewCounterVec(
@@ -35,10 +29,7 @@ var (
 			Name: "cs_virtual_servers_total_requests",
 			Help: "Total virtual server requests",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersTotalResponses = prometheus.NewCounterVec(
@@ -46,10 +37,7 @@ var (
 			Name: "cs_virtual_servers_total_responses",
 			Help: "Total virtual server responses",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersTotalRequestBytes = prometheus.NewCounterVec(
@@ -57,10 +45,7 @@ var (
 			Name: "cs_virtual_servers_total_request_bytes",
 			Help: "Total virtual server request bytes",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersTotalResponseBytes = prometheus.NewCounterVec(
@@ -68,10 +53,7 @@ var (
 			Name: "cs_virtual_servers_total_response_bytes",
 			Help: "Total virtual server response bytes",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersCurrentClientConnections = prometheus.NewGaugeVec(
@@ -79,10 +61,7 @@ var (
 			Name: "cs_virtual_servers_current_client_connections",
 			Help: "Number of current client connections on a specific virtual server",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersCurrentServerConnections = prometheus.NewGaugeVec(
@@ -90,10 +69,7 @@ var (
 			Name: "cs_virtual_servers_current_server_connections",
 			Help: "Number of current connections to the actual servers behind the specific virtual server.",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersEstablishedConnections = prometheus.NewGaugeVec(
@@ -101,10 +77,7 @@ var (
 			Name: "cs_virtual_servers_established_connections",
 			Help: "Number of client connections in ESTABLISHED state.",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersTotalPacketsReceived = prometheus.NewCounterVec(
@@ -112,10 +85,7 @@ var (
 			Name: "cs_virtual_servers_total_packets_received",
 			Help: "Total number of packets received",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersTotalPacketsSent = prometheus.NewCounterVec(
@@ -123,10 +93,7 @@ var (
 			Name: "cs_virtual_servers_total_packets_sent",
 			Help: "Total number of packets sent.",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersTotalSpillovers = prometheus.NewCounterVec(
@@ -134,10 +101,7 @@ var (
 			Name: "cs_virtual_servers_total_spillovers",
 			Help: "Number of times vserver experienced spill over.",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersDeferredRequests = prometheus.NewCounterVec(
@@ -145,10 +109,7 @@ var (
 			Name: "cs_virtual_servers_deferred_requests",
 			Help: "Number of deferred request on this vserver",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersNumberInvalidRequestResponse = prometheus.NewCounterVec(
@@ -156,10 +117,7 @@ var (
 			Name: "cs_virtual_servers_number_invalid_request_response",
 			Help: "Number invalid requests/responses on this vserver",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersNumberInvalidRequestResponseDropped = prometheus.NewCounterVec(
@@ -167,10 +125,7 @@ var (
 			Name: "cs_virtual_servers_number_invalid_request_response_dropped",
 			Help: "Number invalid requests/responses dropped on this vserver",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersTotalVServerDownBackupHits = prometheus.NewCounterVec(
@@ -178,10 +133,7 @@ var (
 			Name: "cs_virtual_servers_total_vserver_down_backup_hits",
 			Help: "Number of times traffic was diverted to backup vserver since primary vserver was DOWN.",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersCurrentMultipathSessions = prometheus.NewGaugeVec(
@@ -189,10 +141,7 @@ var (
 			Name: "cs_virtual_servers_current_multipath_sessions",
 			Help: "Current Multipath TCP sessions",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	csVirtualServersCurrentMultipathSubflows = prometheus.NewGaugeVec(
@@ -200,30 +149,23 @@ var (
 			Name: "cs_virtual_servers_current_multipath_subflows",
 			Help: "Current Multipath TCP subflows",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 )
 
 func (e *Exporter) collectCSVirtualServerState(ns netscaler.NSAPIResponse) {
 	e.csVirtualServersState.Reset()
-
 	for _, vs := range ns.CSVirtualServerStats {
 		state := 0.0
-
 		if vs.State == "UP" {
 			state = 1.0
 		}
-
 		e.csVirtualServersState.WithLabelValues(e.nsInstance, vs.Name).Set(state)
 	}
 }
 
 func (e *Exporter) collectCSVirtualServerTotalHits(ns netscaler.NSAPIResponse) {
 	e.csVirtualServersTotalHits.Reset()
-
 	for _, vs := range ns.CSVirtualServerStats {
 		totalHits, _ := strconv.ParseFloat(vs.TotalHits, 64)
 		e.csVirtualServersTotalHits.WithLabelValues(e.nsInstance, vs.Name).Set(totalHits)
