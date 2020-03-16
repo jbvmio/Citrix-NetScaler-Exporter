@@ -13,8 +13,6 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-
-	"github.com/jbvmio/citrix-netscaler-exporter/collector"
 )
 
 var (
@@ -113,7 +111,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		level.Debug(logger).Log("msg", "scraping target", "target", target)
 	}
 
-	exporter, err := collector.NewExporter(target, *username, *password, ignoreCertCheck, logger, nsInstance)
+	exporter, err := NewExporter(target, *username, *password, ignoreCertCheck, logger, nsInstance)
 	if err != nil {
 		http.Error(w, "Error creating exporter"+err.Error(), 400)
 		level.Error(logger).Log("msg", err)
@@ -123,7 +121,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	registry := prometheus.NewRegistry()
 	registry.MustRegister(exporter)
 
-	// Delegate http serving to Prometheus client library, which will call collector.Collect.
+	// Delegate http serving to Prometheus client library, which will call Collect.
 	h := promhttp.HandlerFor(registry, promhttp.HandlerOpts{})
 	h.ServeHTTP(w, r)
 }
