@@ -8,6 +8,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const (
+	netscalerInstance = `ns_instance`
+)
+
 // Exporter represents the metrics exported to Prometheus
 type Exporter struct {
 	modelID                                             *prometheus.Desc
@@ -106,7 +110,7 @@ type Exporter struct {
 	csVirtualServersNumberInvalidRequestResponse        *prometheus.CounterVec
 	csVirtualServersNumberInvalidRequestResponseDropped *prometheus.CounterVec
 	csVirtualServersTotalVServerDownBackupHits          *prometheus.CounterVec
-	csVirtualServersCurrentMultipathSessions            *prometheus.GaugeVec
+	//csVirtualServersCurrentMultipathSessions            *prometheus.GaugeVec
 	//csVirtualServersCurrentMultipathSubflows            *prometheus.GaugeVec
 	vpnVirtualServersTotalRequests      *prometheus.CounterVec
 	vpnVirtualServersTotalResponses     *prometheus.CounterVec

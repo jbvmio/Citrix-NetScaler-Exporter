@@ -7,17 +7,19 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+var sgstateLabels = []string{
+	netscalerInstance,
+	`servicegroup`,
+	`member`,
+}
+
 var (
 	serviceGroupsState = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "servicegroup_state",
 			Help: "Current state of the server",
 		},
-		[]string{
-			"ns_instance",
-			"servicegroup",
-			"member",
-		},
+		sgstateLabels,
 	)
 
 	serviceGroupsAvgTTFB = prometheus.NewGaugeVec(
@@ -25,11 +27,7 @@ var (
 			Name: "servicegroup_average_time_to_first_byte",
 			Help: "Average TTFB between the NetScaler appliance and the server.",
 		},
-		[]string{
-			"ns_instance",
-			"servicegroup",
-			"member",
-		},
+		sgstateLabels,
 	)
 
 	serviceGroupsTotalRequests = prometheus.NewCounterVec(
@@ -37,11 +35,7 @@ var (
 			Name: "servicegroup_total_requests",
 			Help: "Total number of requests received on this service",
 		},
-		[]string{
-			"ns_instance",
-			"servicegroup",
-			"member",
-		},
+		sgstateLabels,
 	)
 
 	serviceGroupsTotalResponses = prometheus.NewCounterVec(
@@ -49,11 +43,7 @@ var (
 			Name: "servicegroup_total_responses",
 			Help: "Number of responses received on this service.",
 		},
-		[]string{
-			"ns_instance",
-			"servicegroup",
-			"member",
-		},
+		sgstateLabels,
 	)
 
 	serviceGroupsTotalRequestBytes = prometheus.NewCounterVec(
@@ -61,11 +51,7 @@ var (
 			Name: "servicegroup_total_request_bytes",
 			Help: "Total number of request bytes received on this service",
 		},
-		[]string{
-			"ns_instance",
-			"servicegroup",
-			"member",
-		},
+		sgstateLabels,
 	)
 
 	serviceGroupsTotalResponseBytes = prometheus.NewCounterVec(
@@ -73,11 +59,7 @@ var (
 			Name: "servicegroup_total_response_bytes",
 			Help: "Number of response bytes received by this service",
 		},
-		[]string{
-			"ns_instance",
-			"servicegroup",
-			"member",
-		},
+		sgstateLabels,
 	)
 
 	serviceGroupsCurrentClientConnections = prometheus.NewGaugeVec(
@@ -85,11 +67,7 @@ var (
 			Name: "servicegroup_current_client_connections",
 			Help: "Number of current client connections.",
 		},
-		[]string{
-			"ns_instance",
-			"servicegroup",
-			"member",
-		},
+		sgstateLabels,
 	)
 
 	serviceGroupsSurgeCount = prometheus.NewGaugeVec(
@@ -97,11 +75,7 @@ var (
 			Name: "servicegroup_surge_count",
 			Help: "Number of requests in the surge queue.",
 		},
-		[]string{
-			"ns_instance",
-			"servicegroup",
-			"member",
-		},
+		sgstateLabels,
 	)
 
 	serviceGroupsCurrentServerConnections = prometheus.NewGaugeVec(
@@ -109,11 +83,7 @@ var (
 			Name: "servicegroup_current_server_connections",
 			Help: "Number of current connections to the actual servers behind the virtual server.",
 		},
-		[]string{
-			"ns_instance",
-			"servicegroup",
-			"member",
-		},
+		sgstateLabels,
 	)
 
 	serviceGroupsServerEstablishedConnections = prometheus.NewGaugeVec(
@@ -121,11 +91,7 @@ var (
 			Name: "servicegroup_server_established_connections",
 			Help: "Number of server connections in ESTABLISHED state.",
 		},
-		[]string{
-			"ns_instance",
-			"servicegroup",
-			"member",
-		},
+		sgstateLabels,
 	)
 
 	serviceGroupsCurrentReusePool = prometheus.NewGaugeVec(
@@ -133,11 +99,7 @@ var (
 			Name: "servicegroup_current_reuse_pool",
 			Help: "Number of requests in the idle queue/reuse pool.",
 		},
-		[]string{
-			"ns_instance",
-			"servicegroup",
-			"member",
-		},
+		sgstateLabels,
 	)
 
 	serviceGroupsMaxClients = prometheus.NewGaugeVec(
@@ -145,11 +107,7 @@ var (
 			Name: "servicegroup_max_clients",
 			Help: "Maximum open connections allowed on this service.",
 		},
-		[]string{
-			"ns_instance",
-			"servicegroup",
-			"member",
-		},
+		sgstateLabels,
 	)
 )
 

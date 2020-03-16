@@ -7,17 +7,19 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+var interfaceLabels = []string{
+	netscalerInstance,
+	`interface`,
+	`alias`,
+}
+
 var (
 	interfacesRxBytes = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "interfaces_received_bytes",
 			Help: "Number of bytes received by specific interfaces.",
 		},
-		[]string{
-			"ns_instance",
-			"interface",
-			"alias",
-		},
+		interfaceLabels,
 	)
 
 	interfacesTxBytes = prometheus.NewGaugeVec(
@@ -25,11 +27,7 @@ var (
 			Name: "interfaces_transmitted_bytes",
 			Help: "Number of bytes transmitted by specific interfaces.",
 		},
-		[]string{
-			"ns_instance",
-			"interface",
-			"alias",
-		},
+		interfaceLabels,
 	)
 
 	interfacesRxPackets = prometheus.NewGaugeVec(
@@ -37,11 +35,7 @@ var (
 			Name: "interfaces_received_packets",
 			Help: "Number of packets received by specific interfaces",
 		},
-		[]string{
-			"ns_instance",
-			"interface",
-			"alias",
-		},
+		interfaceLabels,
 	)
 
 	interfacesTxPackets = prometheus.NewGaugeVec(
@@ -49,11 +43,7 @@ var (
 			Name: "interfaces_transmitted_packets",
 			Help: "Number of packets transmitted by specific interfaces",
 		},
-		[]string{
-			"ns_instance",
-			"interface",
-			"alias",
-		},
+		interfaceLabels,
 	)
 
 	interfacesJumboPacketsRx = prometheus.NewGaugeVec(
@@ -61,11 +51,7 @@ var (
 			Name: "interfaces_jumbo_packets_received",
 			Help: "Number of bytes received by specific interfaces",
 		},
-		[]string{
-			"ns_instance",
-			"interface",
-			"alias",
-		},
+		interfaceLabels,
 	)
 
 	interfacesJumboPacketsTx = prometheus.NewGaugeVec(
@@ -73,11 +59,7 @@ var (
 			Name: "interfaces_jumbo_packets_transmitted",
 			Help: "Number of jumbo packets transmitted by specific interfaces",
 		},
-		[]string{
-			"ns_instance",
-			"interface",
-			"alias",
-		},
+		interfaceLabels,
 	)
 
 	interfacesErrorPacketsRx = prometheus.NewGaugeVec(
@@ -85,11 +67,7 @@ var (
 			Name: "interfaces_error_packets_received",
 			Help: "Number of error packets received by specific interfaces",
 		},
-		[]string{
-			"ns_instance",
-			"interface",
-			"alias",
-		},
+		interfaceLabels,
 	)
 )
 

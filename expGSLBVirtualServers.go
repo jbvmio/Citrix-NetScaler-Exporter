@@ -7,16 +7,18 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+var vsstateLabels = []string{
+	netscalerInstance,
+	`virtual_server`,
+}
+
 var (
 	gslbVirtualServersHealth = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "gslb_virtual_servers_health",
 			Help: "Percentage of UP services bound to a specific virtual server",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	gslbVirtualServersInactiveServices = prometheus.NewGaugeVec(
@@ -24,10 +26,7 @@ var (
 			Name: "gslb_virtual_servers_inactive_services",
 			Help: "Number of inactive services bound to a specific virtual server",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	gslbVirtualServersActiveServices = prometheus.NewGaugeVec(
@@ -35,10 +34,7 @@ var (
 			Name: "gslb_virtual_servers_active_services",
 			Help: "Number of active services bound to a specific virtual server",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	gslbVirtualServersTotalHits = prometheus.NewCounterVec(
@@ -46,10 +42,7 @@ var (
 			Name: "gslb_virtual_servers_total_hits",
 			Help: "Total virtual server hits",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	gslbVirtualServersTotalRequests = prometheus.NewCounterVec(
@@ -57,10 +50,7 @@ var (
 			Name: "gslb_virtual_servers_total_requests",
 			Help: "Total virtual server requests",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	gslbVirtualServersTotalResponses = prometheus.NewCounterVec(
@@ -68,10 +58,7 @@ var (
 			Name: "gslb_virtual_servers_total_responses",
 			Help: "Total virtual server responses",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	gslbVirtualServersTotalRequestBytes = prometheus.NewCounterVec(
@@ -79,10 +66,7 @@ var (
 			Name: "gslb_virtual_servers_total_request_bytes",
 			Help: "Total virtual server request bytes",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	gslbVirtualServersTotalResponseBytes = prometheus.NewCounterVec(
@@ -90,10 +74,7 @@ var (
 			Name: "gslb_virtual_servers_total_response_bytes",
 			Help: "Total virtual server response bytes",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	gslbVirtualServersCurrentClientConnections = prometheus.NewGaugeVec(
@@ -101,10 +82,7 @@ var (
 			Name: "gslb_virtual_servers_current_client_connections",
 			Help: "Number of current client connections on a specific virtual server",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	gslbVirtualServersCurrentServerConnections = prometheus.NewGaugeVec(
@@ -112,10 +90,7 @@ var (
 			Name: "gslb_virtual_servers_current_server_connections",
 			Help: "Number of current connections to the actual servers behind the specific virtual server.",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 )
 

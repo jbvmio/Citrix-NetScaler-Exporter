@@ -13,10 +13,7 @@ var (
 			Name: "virtual_servers_waiting_requests",
 			Help: "Number of requests waiting on a specific virtual server",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	virtualServersHealth = prometheus.NewGaugeVec(
@@ -24,10 +21,7 @@ var (
 			Name: "virtual_servers_health",
 			Help: "Percentage of UP services bound to a specific virtual server",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	virtualServersInactiveServices = prometheus.NewGaugeVec(
@@ -35,10 +29,7 @@ var (
 			Name: "virtual_servers_inactive_services",
 			Help: "Number of inactive services bound to a specific virtual server",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	virtualServersActiveServices = prometheus.NewGaugeVec(
@@ -46,10 +37,7 @@ var (
 			Name: "virtual_servers_active_services",
 			Help: "Number of active services bound to a specific virtual server",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	virtualServersTotalHits = prometheus.NewCounterVec(
@@ -57,10 +45,7 @@ var (
 			Name: "virtual_servers_total_hits",
 			Help: "Total virtual server hits",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	virtualServersTotalRequests = prometheus.NewCounterVec(
@@ -68,10 +53,7 @@ var (
 			Name: "virtual_servers_total_requests",
 			Help: "Total virtual server requests",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	virtualServersTotalResponses = prometheus.NewCounterVec(
@@ -79,10 +61,7 @@ var (
 			Name: "virtual_servers_total_responses",
 			Help: "Total virtual server responses",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	virtualServersTotalRequestBytes = prometheus.NewCounterVec(
@@ -90,20 +69,14 @@ var (
 			Name: "virtual_servers_total_request_bytes",
 			Help: "Total virtual server request bytes",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 	virtualServersTotalResponseBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "virtual_servers_total_response_bytes",
 			Help: "Total virtual server response bytes",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	virtualServersCurrentClientConnections = prometheus.NewGaugeVec(
@@ -111,10 +84,7 @@ var (
 			Name: "virtual_servers_current_client_connections",
 			Help: "Number of current client connections on a specific virtual server",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 
 	virtualServersCurrentServerConnections = prometheus.NewGaugeVec(
@@ -122,10 +92,7 @@ var (
 			Name: "virtual_servers_current_server_connections",
 			Help: "Number of current connections to the actual servers behind the specific virtual server.",
 		},
-		[]string{
-			"ns_instance",
-			"virtual_server",
-		},
+		vsstateLabels,
 	)
 )
 

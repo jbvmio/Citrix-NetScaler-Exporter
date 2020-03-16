@@ -7,16 +7,18 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+var sstateLabels = []string{
+	netscalerInstance,
+	`service`,
+}
+
 var (
 	gslbServicesState = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "gslb_service_state",
 			Help: "Current state of the service",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	gslbServicesTotalRequests = prometheus.NewCounterVec(
@@ -24,10 +26,7 @@ var (
 			Name: "gslb_service_total_requests",
 			Help: "Total number of requests received on this service",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	gslbServicesTotalResponses = prometheus.NewCounterVec(
@@ -35,10 +34,7 @@ var (
 			Name: "gslb_service_total_responses",
 			Help: "Total number of responses received on this service",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	gslbServicesTotalRequestBytes = prometheus.NewCounterVec(
@@ -46,10 +42,7 @@ var (
 			Name: "gslb_service_total_request_bytes",
 			Help: "Total number of request bytes received on this service",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	gslbServicesTotalResponseBytes = prometheus.NewCounterVec(
@@ -57,10 +50,7 @@ var (
 			Name: "gslb_service_total_response_bytes",
 			Help: "Total number of response bytes received on this service",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	gslbServicesCurrentClientConns = prometheus.NewGaugeVec(
@@ -68,10 +58,7 @@ var (
 			Name: "gslb_service_current_client_connections",
 			Help: "Number of current client connections",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	gslbServicesCurrentServerConns = prometheus.NewGaugeVec(
@@ -79,10 +66,7 @@ var (
 			Name: "gslb_service_current_server_connections",
 			Help: "Number of current connections to the actual servers",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	gslbServicesEstablishedConnections = prometheus.NewGaugeVec(
@@ -90,10 +74,7 @@ var (
 			Name: "gslb_service_established_connections",
 			Help: "Number of server connections in ESTABLISHED state",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	gslbServicesCurrentLoad = prometheus.NewGaugeVec(
@@ -101,10 +82,7 @@ var (
 			Name: "gslb_service_current_load",
 			Help: "Load on the service that is calculated from the bound load based monitor",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	gslbServicesVirtualServerServiceHits = prometheus.NewCounterVec(
@@ -112,10 +90,7 @@ var (
 			Name: "gslb_service_virtual_server_service_hits",
 			Help: "Number of times that the service has been provided",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 )
 

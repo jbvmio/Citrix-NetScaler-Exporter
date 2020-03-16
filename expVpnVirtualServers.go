@@ -7,16 +7,18 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+var vpnVSLabels = []string{
+	netscalerInstance,
+	`vpn_virtual_server`,
+}
+
 var (
 	vpnVirtualServersTotalRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "vpn_virtual_servers_total_requests",
 			Help: "Total VPN virtual server requests",
 		},
-		[]string{
-			"ns_instance",
-			"vpn_virtual_server",
-		},
+		vpnVSLabels,
 	)
 
 	vpnVirtualServersTotalResponses = prometheus.NewCounterVec(
@@ -24,10 +26,7 @@ var (
 			Name: "vpn_virtual_servers_total_responses",
 			Help: "Total VPN virtual server responses",
 		},
-		[]string{
-			"ns_instance",
-			"vpn_virtual_server",
-		},
+		vpnVSLabels,
 	)
 
 	vpnVirtualServersTotalRequestBytes = prometheus.NewCounterVec(
@@ -35,20 +34,14 @@ var (
 			Name: "vpn_virtual_servers_total_request_bytes",
 			Help: "Total VPN virtual server request bytes",
 		},
-		[]string{
-			"ns_instance",
-			"vpn_virtual_server",
-		},
+		vpnVSLabels,
 	)
 	vpnVirtualServersTotalResponseBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "vpn_virtual_servers_total_response_bytes",
 			Help: "Total VPN virtual server response bytes",
 		},
-		[]string{
-			"ns_instance",
-			"vpn_virtual_server",
-		},
+		vpnVSLabels,
 	)
 
 	vpnVirtualServersState = prometheus.NewGaugeVec(
@@ -56,10 +49,7 @@ var (
 			Name: "vpn_virtual_servers_state",
 			Help: "Current state of the VPN virtual server",
 		},
-		[]string{
-			"ns_instance",
-			"vpn_virtual_server",
-		},
+		vpnVSLabels,
 	)
 )
 

@@ -13,10 +13,7 @@ var (
 			Name: "service_throughput",
 			Help: "Number of bytes received or sent by this service (Mbps)",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesAvgTTFB = prometheus.NewGaugeVec(
@@ -24,10 +21,7 @@ var (
 			Name: "service_average_time_to_first_byte",
 			Help: "Average TTFB between the NetScaler appliance and the server. TTFB is the time interval between sending the request packet to a service and receiving the first response from the service",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesState = prometheus.NewGaugeVec(
@@ -35,10 +29,7 @@ var (
 			Name: "service_state",
 			Help: "Current state of the service",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesTotalRequests = prometheus.NewCounterVec(
@@ -46,10 +37,7 @@ var (
 			Name: "service_total_requests",
 			Help: "Total number of requests received on this service",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesTotalResponses = prometheus.NewCounterVec(
@@ -57,10 +45,7 @@ var (
 			Name: "service_total_responses",
 			Help: "Total number of responses received on this service",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesTotalRequestBytes = prometheus.NewCounterVec(
@@ -68,10 +53,7 @@ var (
 			Name: "service_total_request_bytes",
 			Help: "Total number of request bytes received on this service",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesTotalResponseBytes = prometheus.NewCounterVec(
@@ -79,10 +61,7 @@ var (
 			Name: "service_total_response_bytes",
 			Help: "Total number of response bytes received on this service",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesCurrentClientConns = prometheus.NewGaugeVec(
@@ -90,10 +69,7 @@ var (
 			Name: "service_current_client_connections",
 			Help: "Number of current client connections",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesSurgeCount = prometheus.NewGaugeVec(
@@ -101,10 +77,7 @@ var (
 			Name: "service_surge_count",
 			Help: "Number of requests in the surge queue",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesCurrentServerConns = prometheus.NewGaugeVec(
@@ -112,10 +85,7 @@ var (
 			Name: "service_current_server_connections",
 			Help: "Number of current connections to the actual servers",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesServerEstablishedConnections = prometheus.NewGaugeVec(
@@ -123,10 +93,7 @@ var (
 			Name: "service_server_established_connections",
 			Help: "Number of server connections in ESTABLISHED state",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesCurrentReusePool = prometheus.NewGaugeVec(
@@ -134,10 +101,7 @@ var (
 			Name: "service_current_reuse_pool",
 			Help: "Number of requests in the idle queue/reuse pool.",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesMaxClients = prometheus.NewGaugeVec(
@@ -145,10 +109,7 @@ var (
 			Name: "service_max_clients",
 			Help: "Maximum open connections allowed on this service",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesCurrentLoad = prometheus.NewGaugeVec(
@@ -156,10 +117,7 @@ var (
 			Name: "service_current_load",
 			Help: "Load on the service that is calculated from the bound load based monitor",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesVirtualServerServiceHits = prometheus.NewCounterVec(
@@ -167,10 +125,7 @@ var (
 			Name: "service_virtual_server_service_hits",
 			Help: "Number of times that the service has been provided",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 
 	servicesActiveTransactions = prometheus.NewGaugeVec(
@@ -178,10 +133,7 @@ var (
 			Name: "service_active_transactions",
 			Help: "Number of active transactions handled by this service. (Including those in the surge queue.) Active Transaction means number of transactions currently served by the server including those waiting in the SurgeQ",
 		},
-		[]string{
-			"ns_instance",
-			"service",
-		},
+		sstateLabels,
 	)
 )
 
