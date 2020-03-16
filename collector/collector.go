@@ -1,16 +1,20 @@
 package collector
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/go-kit/kit/log/level"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/jbvmio/citrix-netscaler-exporter/netscaler"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // Collect is initiated by the Prometheus handler and gathers the metrics
 func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
+
+	fmt.Printf("DEBUG: Starting Collect!\n")
+
 	nsClient, err := netscaler.NewNitroClient(e.url, e.username, e.password, e.ignoreCert)
 	if err != nil {
 		level.Error(e.logger).Log("msg", err)
@@ -347,11 +351,11 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	e.collectCSVirtualServerTotalVServerDownBackupHits(csVirtualServers)
 	e.csVirtualServersTotalVServerDownBackupHits.Collect(ch)
 
-	e.collectCSVirtualServerCurrentMultipathSessions(csVirtualServers)
-	e.csVirtualServersCurrentMultipathSessions.Collect(ch)
+	//e.collectCSVirtualServerCurrentMultipathSessions(csVirtualServers)
+	//e.csVirtualServersCurrentMultipathSessions.Collect(ch)
 
-	e.collectCSVirtualServerCurrentMultipathSubflows(csVirtualServers)
-	e.csVirtualServersCurrentMultipathSubflows.Collect(ch)
+	//e.collectCSVirtualServerCurrentMultipathSubflows(csVirtualServers)
+	//e.csVirtualServersCurrentMultipathSubflows.Collect(ch)
 
 	e.collectVPNVirtualServerTotalRequests(vpnVirtualServers)
 	e.vpnVirtualServersTotalRequests.Collect(ch)

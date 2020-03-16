@@ -3,8 +3,8 @@ package collector
 import (
 	"strconv"
 
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/jbvmio/citrix-netscaler-exporter/netscaler"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
@@ -356,6 +356,7 @@ func (e *Exporter) collectCSVirtualServerTotalVServerDownBackupHits(ns netscaler
 	}
 }
 
+/*
 func (e *Exporter) collectCSVirtualServerCurrentMultipathSessions(ns netscaler.NSAPIResponse) {
 	e.csVirtualServersCurrentMultipathSessions.Reset()
 
@@ -365,6 +366,7 @@ func (e *Exporter) collectCSVirtualServerCurrentMultipathSessions(ns netscaler.N
 	}
 }
 
+
 func (e *Exporter) collectCSVirtualServerCurrentMultipathSubflows(ns netscaler.NSAPIResponse) {
 	e.csVirtualServersCurrentMultipathSubflows.Reset()
 
@@ -373,3 +375,4 @@ func (e *Exporter) collectCSVirtualServerCurrentMultipathSubflows(ns netscaler.N
 		e.csVirtualServersCurrentMultipathSubflows.WithLabelValues(e.nsInstance, vs.Name).Set(currentMultipathSubflows)
 	}
 }
+*/

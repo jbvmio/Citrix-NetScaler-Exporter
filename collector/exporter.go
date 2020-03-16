@@ -107,18 +107,18 @@ type Exporter struct {
 	csVirtualServersNumberInvalidRequestResponseDropped *prometheus.CounterVec
 	csVirtualServersTotalVServerDownBackupHits          *prometheus.CounterVec
 	csVirtualServersCurrentMultipathSessions            *prometheus.GaugeVec
-	csVirtualServersCurrentMultipathSubflows            *prometheus.GaugeVec
-	vpnVirtualServersTotalRequests                      *prometheus.CounterVec
-	vpnVirtualServersTotalResponses                     *prometheus.CounterVec
-	vpnVirtualServersTotalRequestBytes                  *prometheus.CounterVec
-	vpnVirtualServersTotalResponseBytes                 *prometheus.CounterVec
-	vpnVirtualServersState                              *prometheus.GaugeVec
-	username                                            string
-	password                                            string
-	url                                                 string
-	ignoreCert                                          bool
-	logger                                              log.Logger
-	nsInstance                                          string
+	//csVirtualServersCurrentMultipathSubflows            *prometheus.GaugeVec
+	vpnVirtualServersTotalRequests      *prometheus.CounterVec
+	vpnVirtualServersTotalResponses     *prometheus.CounterVec
+	vpnVirtualServersTotalRequestBytes  *prometheus.CounterVec
+	vpnVirtualServersTotalResponseBytes *prometheus.CounterVec
+	vpnVirtualServersState              *prometheus.GaugeVec
+	username                            string
+	password                            string
+	url                                 string
+	ignoreCert                          bool
+	logger                              log.Logger
+	nsInstance                          string
 }
 
 // NewExporter initialises the exporter
@@ -232,19 +232,20 @@ func NewExporter(url string, username string, password string, ignoreCert bool, 
 		csVirtualServersNumberInvalidRequestResponse:        csVirtualServersNumberInvalidRequestResponse,
 		csVirtualServersNumberInvalidRequestResponseDropped: csVirtualServersNumberInvalidRequestResponseDropped,
 		csVirtualServersTotalVServerDownBackupHits:          csVirtualServersTotalVServerDownBackupHits,
-		csVirtualServersCurrentMultipathSessions:            csVirtualServersCurrentMultipathSessions,
-		csVirtualServersCurrentMultipathSubflows:            csVirtualServersCurrentMultipathSubflows,
-		vpnVirtualServersTotalRequests:                      vpnVirtualServersTotalRequests,
-		vpnVirtualServersTotalResponses:                     vpnVirtualServersTotalResponses,
-		vpnVirtualServersTotalRequestBytes:                  vpnVirtualServersTotalRequestBytes,
-		vpnVirtualServersTotalResponseBytes:                 vpnVirtualServersTotalResponseBytes,
-		vpnVirtualServersState:                              vpnVirtualServersState,
-		username:                                            username,
-		password:                                            password,
-		url:                                                 url,
-		ignoreCert:                                          ignoreCert,
-		logger:                                              logger,
-		nsInstance:                                          nsInstance,
+
+		//csVirtualServersCurrentMultipathSessions:            csVirtualServersCurrentMultipathSessions,
+		//csVirtualServersCurrentMultipathSubflows:            csVirtualServersCurrentMultipathSubflows,
+		vpnVirtualServersTotalRequests:      vpnVirtualServersTotalRequests,
+		vpnVirtualServersTotalResponses:     vpnVirtualServersTotalResponses,
+		vpnVirtualServersTotalRequestBytes:  vpnVirtualServersTotalRequestBytes,
+		vpnVirtualServersTotalResponseBytes: vpnVirtualServersTotalResponseBytes,
+		vpnVirtualServersState:              vpnVirtualServersState,
+		username:                            username,
+		password:                            password,
+		url:                                 url,
+		ignoreCert:                          ignoreCert,
+		logger:                              logger,
+		nsInstance:                          nsInstance,
 	}, nil
 }
 
@@ -353,8 +354,9 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.csVirtualServersNumberInvalidRequestResponse.Describe(ch)
 	e.csVirtualServersNumberInvalidRequestResponseDropped.Describe(ch)
 	e.csVirtualServersTotalVServerDownBackupHits.Describe(ch)
-	e.csVirtualServersCurrentMultipathSessions.Describe(ch)
-	e.csVirtualServersCurrentMultipathSubflows.Describe(ch)
+
+	//e.csVirtualServersCurrentMultipathSessions.Describe(ch)
+	//e.csVirtualServersCurrentMultipathSubflows.Describe(ch)
 
 	e.vpnVirtualServersTotalRequests.Describe(ch)
 	e.vpnVirtualServersTotalResponses.Describe(ch)
