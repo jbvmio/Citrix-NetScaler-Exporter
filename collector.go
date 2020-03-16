@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -12,8 +11,6 @@ import (
 
 // Collect is initiated by the Prometheus handler and gathers the metrics
 func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
-
-	fmt.Printf("DEBUG: Starting Collect!\n")
 
 	nsClient, err := netscaler.NewNitroClient(e.url, e.username, e.password, e.ignoreCert)
 	if err != nil {

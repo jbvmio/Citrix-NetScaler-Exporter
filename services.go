@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/jbvmio/citrix-netscaler-exporter/netscaler"
@@ -207,10 +206,8 @@ func (e *Exporter) collectServicesAvgTTFB(ns netscaler.NSAPIResponse) {
 func (e *Exporter) collectServicesState(ns netscaler.NSAPIResponse) {
 	e.servicesState.Reset()
 
-	fmt.Printf(">>> HERE <<<\n")
 	for _, service := range ns.ServiceStats {
 		var state float64
-
 		switch service.State {
 		case `DOWN`:
 			state = 0.0
@@ -221,9 +218,6 @@ func (e *Exporter) collectServicesState(ns netscaler.NSAPIResponse) {
 		default:
 			state = 3.0
 		}
-
-		fmt.Printf("DEBUG: %s > %s > %v\n", service.Name, service.State, state)
-
 		e.servicesState.WithLabelValues(e.nsInstance, service.Name).Set(state)
 	}
 }
