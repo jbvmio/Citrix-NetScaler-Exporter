@@ -11,7 +11,7 @@ require (
 	github.com/go-logfmt/logfmt v0.5.0 // indirect
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/google/go-cmp v0.4.0 // indirect
-	github.com/jbvmio/citrix-netscaler-exporter/netscaler v0.0.0-20200316164700-076f6f950d49
+	github.com/jbvmio/citrix-netscaler-exporter/netscaler v0.0.0-20200316184257-3e261bdcae02
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/julienschmidt/httprouter v1.2.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
@@ -31,3 +31,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.2.5 // indirect
 )
+
+replace github.com/jbvmio/citrix-netscaler-exporter/netscaler => ./netscaler

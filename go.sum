@@ -29,8 +29,11 @@ github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMyw
 github.com/google/go-cmp v0.4.0 h1:xsAVV57WRhGj6kEIi8ReJzQlHHqcBYCElAvkovg3B/4=
 github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
+github.com/jbvmio/citrix-netscaler-exporter v0.0.0-20200316184257-3e261bdcae02 h1:u2avctGEU4ZYXkx++zZsYCtl36xBhiXeCs0lVeIB3I8=
 github.com/jbvmio/citrix-netscaler-exporter/netscaler v0.0.0-20200316164700-076f6f950d49 h1:y6XhVQJopw2D21u9H5mWQpdwY8hADPaIVNHo/s7PSQU=
 github.com/jbvmio/citrix-netscaler-exporter/netscaler v0.0.0-20200316164700-076f6f950d49/go.mod h1:3efCBCKt0c5BOsCyBmstObJ5Q8SM+i5QyHwNz5ulKdM=
+github.com/jbvmio/citrix-netscaler-exporter/netscaler v0.0.0-20200316184257-3e261bdcae02 h1:57m4V1+NkbDSSuBHCHPLLTUHsurJ3713gRoEOVNcBm0=
+github.com/jbvmio/citrix-netscaler-exporter/netscaler v0.0.0-20200316184257-3e261bdcae02/go.mod h1:3efCBCKt0c5BOsCyBmstObJ5Q8SM+i5QyHwNz5ulKdM=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/json-iterator/go v1.1.9/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=

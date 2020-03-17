@@ -9,6 +9,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const namespace = "citrixadc"
+
 // Collect is initiated by the Prometheus handler and gathers the metrics
 func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 
@@ -192,6 +194,9 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	e.collectVirtualServerCurrentServerConnections(virtualServers)
 	e.virtualServersCurrentServerConnections.Collect(ch)
 
+	e.collectVirtualServerState(virtualServers)
+	e.virtualServersState.Collect(ch)
+
 	e.collectServicesThroughput(services)
 	e.servicesThroughput.Collect(ch)
 
@@ -231,11 +236,13 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	e.collectServicesMaxClients(services)
 	e.servicesMaxClients.Collect(ch)
 
-	e.collectServicesCurrentLoad(services)
-	e.servicesCurrentLoad.Collect(ch)
+	/*
+		e.collectServicesCurrentLoad(services)
+		e.servicesCurrentLoad.Collect(ch)
 
-	e.collectServicesVirtualServerServiceHits(services)
-	e.servicesVirtualServerServiceHits.Collect(ch)
+		e.collectServicesVirtualServerServiceHits(services)
+		e.servicesVirtualServerServiceHits.Collect(ch)
+	*/
 
 	e.collectServicesActiveTransactions(services)
 	e.servicesActiveTransactions.Collect(ch)
@@ -264,11 +271,13 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	e.collectGSLBServicesEstablishedConnections(gslbServices)
 	e.gslbServicesEstablishedConnections.Collect(ch)
 
-	e.collectGSLBServicesCurrentLoad(gslbServices)
-	e.gslbServicesCurrentLoad.Collect(ch)
+	/*
+		e.collectGSLBServicesCurrentLoad(gslbServices)
+		e.gslbServicesCurrentLoad.Collect(ch)
 
-	e.collectGSLBServicesVirtualServerServiceHits(gslbServices)
-	e.gslbServicesVirtualServerServiceHits.Collect(ch)
+		e.collectGSLBServicesVirtualServerServiceHits(gslbServices)
+		e.gslbServicesVirtualServerServiceHits.Collect(ch)
+	*/
 
 	e.collectGSLBVirtualServerHealth(gslbVirtualServers)
 	e.gslbVirtualServersHealth.Collect(ch)

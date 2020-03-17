@@ -7,158 +7,208 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const csVirtualServersSubsystem = "cs_vserver"
+
+var csVirtualServersLabels = []string{
+	netscalerInstance,
+	`citrixadc_cs_name`,
+}
+
 var (
 	csVirtualServersState = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "cs_virtual_servers_state",
-			Help: "Current state of the server",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "state",
+			Help:      "Current state of the server. 0 = DOWN, 1 = UP, 2 = OUT OF SERVICE, 3 = UNKNOWN",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersTotalHits = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "cs_virtual_servers_total_hits",
-			Help: "Total virtual server hits",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "hits_total",
+			Help:      "Total virtual server hits",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersTotalRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "cs_virtual_servers_total_requests",
-			Help: "Total virtual server requests",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "requests_total",
+			Help:      "Total virtual server requests",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersTotalResponses = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "cs_virtual_servers_total_responses",
-			Help: "Total virtual server responses",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "responses_total",
+			Help:      "Total virtual server responses",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersTotalRequestBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "cs_virtual_servers_total_request_bytes",
-			Help: "Total virtual server request bytes",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "request_bytes_total",
+			Help:      "Total virtual server request bytes",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersTotalResponseBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "cs_virtual_servers_total_response_bytes",
-			Help: "Total virtual server response bytes",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "response_bytes_total",
+			Help:      "Total virtual server response bytes",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersCurrentClientConnections = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "cs_virtual_servers_current_client_connections",
-			Help: "Number of current client connections on a specific virtual server",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "current_client_connections",
+			Help:      "Number of current client connections on a specific virtual server",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersCurrentServerConnections = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "cs_virtual_servers_current_server_connections",
-			Help: "Number of current connections to the actual servers behind the specific virtual server.",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "current_server_connections",
+			Help:      "Number of current connections to the actual servers behind the specific virtual server.",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersEstablishedConnections = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "cs_virtual_servers_established_connections",
-			Help: "Number of client connections in ESTABLISHED state.",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "established_connections",
+			Help:      "Number of client connections in ESTABLISHED state.",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersTotalPacketsReceived = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "cs_virtual_servers_total_packets_received",
-			Help: "Total number of packets received",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "packets_received_total",
+			Help:      "Total number of packets received",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersTotalPacketsSent = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "cs_virtual_servers_total_packets_sent",
-			Help: "Total number of packets sent.",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "packets_sent_total",
+			Help:      "Total number of packets sent.",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersTotalSpillovers = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "cs_virtual_servers_total_spillovers",
-			Help: "Number of times vserver experienced spill over.",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "spillovers_total",
+			Help:      "Number of times vserver experienced spill over.",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersDeferredRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "cs_virtual_servers_deferred_requests",
-			Help: "Number of deferred request on this vserver",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "deferred_requests_total",
+			Help:      "Number of deferred request on this vserver",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersNumberInvalidRequestResponse = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "cs_virtual_servers_number_invalid_request_response",
-			Help: "Number invalid requests/responses on this vserver",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "invalid_request_response_total",
+			Help:      "Number invalid requests/responses on this vserver",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersNumberInvalidRequestResponseDropped = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "cs_virtual_servers_number_invalid_request_response_dropped",
-			Help: "Number invalid requests/responses dropped on this vserver",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "invalid_request_response_dropped_total",
+			Help:      "Number invalid requests/responses dropped on this vserver",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersTotalVServerDownBackupHits = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "cs_virtual_servers_total_vserver_down_backup_hits",
-			Help: "Number of times traffic was diverted to backup vserver since primary vserver was DOWN.",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "vserver_down_backup_hits_total",
+			Help:      "Number of times traffic was diverted to backup vserver since primary vserver was DOWN.",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersCurrentMultipathSessions = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "cs_virtual_servers_current_multipath_sessions",
-			Help: "Current Multipath TCP sessions",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "current_multipath_sessions",
+			Help:      "Current Multipath TCP sessions",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 
 	csVirtualServersCurrentMultipathSubflows = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "cs_virtual_servers_current_multipath_subflows",
-			Help: "Current Multipath TCP subflows",
+			Namespace: namespace,
+			Subsystem: csVirtualServersSubsystem,
+			Name:      "current_multipath_subflows",
+			Help:      "Current Multipath TCP subflows",
 		},
-		vsstateLabels,
+		csVirtualServersLabels,
 	)
 )
 
 func (e *Exporter) collectCSVirtualServerState(ns netscaler.NSAPIResponse) {
 	e.csVirtualServersState.Reset()
 	for _, vs := range ns.CSVirtualServerStats {
-		state := 0.0
-		if vs.State == "UP" {
+		var state float64
+		switch vs.State {
+		case `DOWN`:
+			state = 0.0
+		case `UP`:
 			state = 1.0
+		case `OUT OF SERVICE`:
+			state = 2.0
+		default:
+			state = 3.0
 		}
 		e.csVirtualServersState.WithLabelValues(e.nsInstance, vs.Name).Set(state)
 	}
