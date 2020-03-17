@@ -7,133 +7,173 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const servicesSubsystem = "service"
+
+var servicesLabels = []string{
+	netscalerInstance,
+	`citrixadc_service_name`,
+}
+
 var (
+	// TODO - Convert megabytes to bytes
 	servicesThroughput = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "service_throughput",
-			Help: "Number of bytes received or sent by this service (Mbps)",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "throughput_bytes_total",
+			Help:      "Number of bytes received or sent by this service",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesAvgTTFB = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "service_average_time_to_first_byte",
-			Help: "Average TTFB between the NetScaler appliance and the server. TTFB is the time interval between sending the request packet to a service and receiving the first response from the service",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "average_time_to_first_byte_seconds",
+			Help:      "Average TTFB between the NetScaler appliance and the server. TTFB is the time interval between sending the request packet to a service and receiving the first response from the service",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesState = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "service_state",
-			Help: "Current state of the service",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "state",
+			Help:      "Current state of the service. 0 = DOWN, 1 = UP, 2 = OUT OF SERVICE, 3 = UNKNOWN",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesTotalRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "service_total_requests",
-			Help: "Total number of requests received on this service",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "requests_total",
+			Help:      "Total number of requests received on this service",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesTotalResponses = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "service_total_responses",
-			Help: "Total number of responses received on this service",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "responses_total",
+			Help:      "Total number of responses received on this service",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesTotalRequestBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "service_total_request_bytes",
-			Help: "Total number of request bytes received on this service",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "request_bytes_total",
+			Help:      "Total number of request bytes received on this service",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesTotalResponseBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "service_total_response_bytes",
-			Help: "Total number of response bytes received on this service",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "response_bytes_total",
+			Help:      "Total number of response bytes received on this service",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesCurrentClientConns = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "service_current_client_connections",
-			Help: "Number of current client connections",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "current_client_connections",
+			Help:      "Number of current client connections",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesSurgeCount = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "service_surge_count",
-			Help: "Number of requests in the surge queue",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "surge_queue",
+			Help:      "Number of requests in the surge queue",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesCurrentServerConns = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "service_current_server_connections",
-			Help: "Number of current connections to the actual servers",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "current_server_connections",
+			Help:      "Number of current connections to the actual servers",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesServerEstablishedConnections = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "service_server_established_connections",
-			Help: "Number of server connections in ESTABLISHED state",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "server_established_connections",
+			Help:      "Number of server connections in ESTABLISHED state",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesCurrentReusePool = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "service_current_reuse_pool",
-			Help: "Number of requests in the idle queue/reuse pool.",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "current_reuse_pool",
+			Help:      "Number of requests in the idle queue/reuse pool.",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesMaxClients = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "service_max_clients",
-			Help: "Maximum open connections allowed on this service",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "max_clients",
+			Help:      "Maximum open connections allowed on this service",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesCurrentLoad = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "service_current_load",
-			Help: "Load on the service that is calculated from the bound load based monitor",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "current_load",
+			Help:      "Load on the service that is calculated from the bound load based monitor",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesVirtualServerServiceHits = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "service_virtual_server_service_hits",
-			Help: "Number of times that the service has been provided",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "vserver_service_hits_total",
+			Help:      "Number of times that the service has been provided",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 
 	servicesActiveTransactions = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "service_active_transactions",
-			Help: "Number of active transactions handled by this service. (Including those in the surge queue.) Active Transaction means number of transactions currently served by the server including those waiting in the SurgeQ",
+			Namespace: namespace,
+			Subsystem: servicesSubsystem,
+			Name:      "active_transactions",
+			Help:      "Number of active transactions handled by this service. (Including those in the surge queue.) Active Transaction means number of transactions currently served by the server including those waiting in the SurgeQ",
 		},
-		sstateLabels,
+		servicesLabels,
 	)
 )
 
@@ -141,8 +181,11 @@ func (e *Exporter) collectServicesThroughput(ns netscaler.NSAPIResponse) {
 	e.servicesThroughput.Reset()
 
 	for _, service := range ns.ServiceStats {
+		var throughputInBytes float64
 		val, _ := strconv.ParseFloat(service.Throughput, 64)
-		e.servicesThroughput.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		// Value is in megabytes. Convert to base unit of bytes
+		throughputInBytes = val * 1024 * 1024
+		e.servicesThroughput.WithLabelValues(e.nsInstance, service.Name).Set(throughputInBytes)
 	}
 }
 
@@ -150,8 +193,10 @@ func (e *Exporter) collectServicesAvgTTFB(ns netscaler.NSAPIResponse) {
 	e.servicesAvgTTFB.Reset()
 
 	for _, service := range ns.ServiceStats {
+		var servicesAvgTTFBInSeconds float64
 		val, _ := strconv.ParseFloat(service.AvgTimeToFirstByte, 64)
-		e.servicesAvgTTFB.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		servicesAvgTTFBInSeconds = val * 0.001
+		e.servicesAvgTTFB.WithLabelValues(e.nsInstance, service.Name).Set(servicesAvgTTFBInSeconds)
 	}
 }
 
@@ -264,6 +309,7 @@ func (e *Exporter) collectServicesMaxClients(ns netscaler.NSAPIResponse) {
 	}
 }
 
+/*
 func (e *Exporter) collectServicesCurrentLoad(ns netscaler.NSAPIResponse) {
 	e.servicesCurrentLoad.Reset()
 
@@ -281,6 +327,7 @@ func (e *Exporter) collectServicesVirtualServerServiceHits(ns netscaler.NSAPIRes
 		e.servicesVirtualServerServiceHits.WithLabelValues(e.nsInstance, service.Name).Set(val)
 	}
 }
+*/
 
 func (e *Exporter) collectServicesActiveTransactions(ns netscaler.NSAPIResponse) {
 	e.servicesActiveTransactions.Reset()

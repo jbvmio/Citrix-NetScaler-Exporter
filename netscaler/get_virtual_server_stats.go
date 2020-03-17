@@ -20,6 +20,8 @@ type VirtualServerStats struct {
 	TotalResponseBytes       string `json:"totalresponsebytes"`
 	CurrentClientConnections string `json:"curclntconnections"`
 	CurrentServerConnections string `json:"cursrvrconnections"`
+	Type                     string `json:"type"`
+	State                    string `json:"state"`
 }
 
 // GetVirtualServerStats queries the Nitro API for virtual server stats

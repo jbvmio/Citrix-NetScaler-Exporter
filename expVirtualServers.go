@@ -7,92 +7,131 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const virtualServersSubsystem = "lb_vserver"
+
+var virtualServersLabels = []string{
+	netscalerInstance,
+	`citrixadc_lb_name`,
+}
+
 var (
 	virtualServersWaitingRequests = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "virtual_servers_waiting_requests",
-			Help: "Number of requests waiting on a specific virtual server",
+			Namespace: namespace,
+			Subsystem: virtualServersSubsystem,
+			Name:      "waiting_requests",
+			Help:      "Number of requests waiting on a specific virtual server",
 		},
-		vsstateLabels,
+		virtualServersLabels,
 	)
 
 	virtualServersHealth = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "virtual_servers_health",
-			Help: "Percentage of UP services bound to a specific virtual server",
+			Namespace: namespace,
+			Subsystem: virtualServersSubsystem,
+			Name:      "health",
+			Help:      "Percentage of UP services bound to a specific virtual server",
 		},
-		vsstateLabels,
+		virtualServersLabels,
 	)
 
 	virtualServersInactiveServices = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "virtual_servers_inactive_services",
-			Help: "Number of inactive services bound to a specific virtual server",
+			Namespace: namespace,
+			Subsystem: virtualServersSubsystem,
+			Name:      "inactive_services",
+			Help:      "Number of inactive services bound to a specific virtual server",
 		},
-		vsstateLabels,
+		virtualServersLabels,
 	)
 
 	virtualServersActiveServices = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "virtual_servers_active_services",
-			Help: "Number of active services bound to a specific virtual server",
+			Namespace: namespace,
+			Subsystem: virtualServersSubsystem,
+			Name:      "active_services",
+			Help:      "Number of active services bound to a specific virtual server",
 		},
-		vsstateLabels,
+		virtualServersLabels,
 	)
 
 	virtualServersTotalHits = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "virtual_servers_total_hits",
-			Help: "Total virtual server hits",
+			Namespace: namespace,
+			Subsystem: virtualServersSubsystem,
+			Name:      "hits_total",
+			Help:      "Total virtual server hits",
 		},
-		vsstateLabels,
+		virtualServersLabels,
 	)
 
 	virtualServersTotalRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "virtual_servers_total_requests",
-			Help: "Total virtual server requests",
+			Namespace: namespace,
+			Subsystem: virtualServersSubsystem,
+			Name:      "requests_total",
+			Help:      "Total virtual server requests",
 		},
-		vsstateLabels,
+		virtualServersLabels,
 	)
 
 	virtualServersTotalResponses = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "virtual_servers_total_responses",
-			Help: "Total virtual server responses",
+			Namespace: namespace,
+			Subsystem: virtualServersSubsystem,
+			Name:      "responses_total",
+			Help:      "Total virtual server responses",
 		},
-		vsstateLabels,
+		virtualServersLabels,
 	)
 
 	virtualServersTotalRequestBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "virtual_servers_total_request_bytes",
-			Help: "Total virtual server request bytes",
+			Namespace: namespace,
+			Subsystem: virtualServersSubsystem,
+			Name:      "request_bytes_total",
+			Help:      "Total virtual server request bytes",
 		},
-		vsstateLabels,
+		virtualServersLabels,
 	)
 	virtualServersTotalResponseBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "virtual_servers_total_response_bytes",
-			Help: "Total virtual server response bytes",
+			Namespace: namespace,
+			Subsystem: virtualServersSubsystem,
+			Name:      "response_bytes_total",
+			Help:      "Total virtual server response bytes",
 		},
-		vsstateLabels,
+		virtualServersLabels,
 	)
 
 	virtualServersCurrentClientConnections = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "virtual_servers_current_client_connections",
-			Help: "Number of current client connections on a specific virtual server",
+			Namespace: namespace,
+			Subsystem: virtualServersSubsystem,
+			Name:      "current_client_connections",
+			Help:      "Number of current client connections on a specific virtual server",
 		},
-		vsstateLabels,
+		virtualServersLabels,
 	)
 
 	virtualServersCurrentServerConnections = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "virtual_servers_current_server_connections",
-			Help: "Number of current connections to the actual servers behind the specific virtual server.",
+			Namespace: namespace,
+			Subsystem: virtualServersSubsystem,
+			Name:      "current_server_connections",
+			Help:      "Number of current connections to the actual servers behind the specific virtual server.",
 		},
-		vsstateLabels,
+		virtualServersLabels,
+	)
+
+	virtualServersState = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: namespace,
+			Subsystem: virtualServersSubsystem,
+			Name:      "state",
+			Help:      "Current state of the vserver. 0 = DOWN, 1 = UP, 2 = OUT OF SERVICE, 3 = UNKNOWN",
+		},
+		virtualServersLabels,
 	)
 )
 
@@ -192,5 +231,25 @@ func (e *Exporter) collectVirtualServerCurrentServerConnections(ns netscaler.NSA
 	for _, vs := range ns.VirtualServerStats {
 		currentServerConnections, _ := strconv.ParseFloat(vs.CurrentServerConnections, 64)
 		e.virtualServersCurrentServerConnections.WithLabelValues(e.nsInstance, vs.Name).Set(currentServerConnections)
+	}
+}
+
+func (e *Exporter) collectVirtualServerState(ns netscaler.NSAPIResponse) {
+	e.virtualServersState.Reset()
+
+	for _, vs := range ns.VirtualServerStats {
+		var state float64
+		switch vs.State {
+		case `DOWN`:
+			state = 0.0
+		case `UP`:
+			state = 1.0
+		case `OUT OF SERVICE`:
+			state = 2.0
+		default:
+			state = 3.0
+		}
+
+		e.virtualServersState.WithLabelValues(e.nsInstance, vs.Name).Set(state)
 	}
 }

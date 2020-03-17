@@ -7,6 +7,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const vpnVirtualServersSubsystem = "vpnvserver"
+
 var vpnVSLabels = []string{
 	netscalerInstance,
 	`vpn_virtual_server`,
@@ -15,39 +17,49 @@ var vpnVSLabels = []string{
 var (
 	vpnVirtualServersTotalRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "vpn_virtual_servers_total_requests",
-			Help: "Total VPN virtual server requests",
+			Namespace: namespace,
+			Subsystem: vpnVirtualServersSubsystem,
+			Name:      "requests_total",
+			Help:      "Total VPN virtual server requests",
 		},
 		vpnVSLabels,
 	)
 
 	vpnVirtualServersTotalResponses = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "vpn_virtual_servers_total_responses",
-			Help: "Total VPN virtual server responses",
+			Namespace: namespace,
+			Subsystem: vpnVirtualServersSubsystem,
+			Name:      "responses_total",
+			Help:      "Total VPN virtual server responses",
 		},
 		vpnVSLabels,
 	)
 
 	vpnVirtualServersTotalRequestBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "vpn_virtual_servers_total_request_bytes",
-			Help: "Total VPN virtual server request bytes",
+			Namespace: namespace,
+			Subsystem: vpnVirtualServersSubsystem,
+			Name:      "request_bytes_total",
+			Help:      "Total VPN virtual server request bytes",
 		},
 		vpnVSLabels,
 	)
 	vpnVirtualServersTotalResponseBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "vpn_virtual_servers_total_response_bytes",
-			Help: "Total VPN virtual server response bytes",
+			Namespace: namespace,
+			Subsystem: vpnVirtualServersSubsystem,
+			Name:      "response_bytes_total",
+			Help:      "Total VPN virtual server response bytes",
 		},
 		vpnVSLabels,
 	)
 
 	vpnVirtualServersState = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "vpn_virtual_servers_state",
-			Help: "Current state of the VPN virtual server",
+			Namespace: namespace,
+			Subsystem: vpnVirtualServersSubsystem,
+			Name:      "state",
+			Help:      "Current state of the VPN virtual server. 0 = DOWN, 1 = UP, 2 = OUT OF SERVICE, 3 = UNKNOWN",
 		},
 		vpnVSLabels,
 	)
@@ -93,10 +105,16 @@ func (e *Exporter) collectVPNVirtualServerState(ns netscaler.NSAPIResponse) {
 	e.vpnVirtualServersState.Reset()
 
 	for _, vs := range ns.VPNVirtualServerStats {
-		state := 0.0
-
-		if vs.State == "UP" {
+		var state float64
+		switch vs.State {
+		case `DOWN`:
+			state = 0.0
+		case `UP`:
 			state = 1.0
+		case `OUT OF SERVICE`:
+			state = 2.0
+		default:
+			state = 3.0
 		}
 
 		e.vpnVirtualServersState.WithLabelValues(e.nsInstance, vs.Name).Set(state)

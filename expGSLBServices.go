@@ -7,90 +7,112 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var sstateLabels = []string{
+const gslbServicesSubsystem = "gslb_service"
+
+var gslbServicesLabels = []string{
 	netscalerInstance,
-	`service`,
+	`citrixadc_service_name`,
 }
 
 var (
 	gslbServicesState = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "gslb_service_state",
-			Help: "Current state of the service",
+			Namespace: namespace,
+			Subsystem: gslbServicesSubsystem,
+			Name:      "state",
+			Help:      "Current state of the service. 0 = DOWN, 1 = UP, 2 = OUT OF SERVICE, 3 = UNKNOWN",
 		},
-		sstateLabels,
+		gslbServicesLabels,
 	)
 
 	gslbServicesTotalRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "gslb_service_total_requests",
-			Help: "Total number of requests received on this service",
+			Namespace: namespace,
+			Subsystem: gslbServicesSubsystem,
+			Name:      "requests_total",
+			Help:      "Total number of requests received on this service",
 		},
-		sstateLabels,
+		gslbServicesLabels,
 	)
 
 	gslbServicesTotalResponses = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "gslb_service_total_responses",
-			Help: "Total number of responses received on this service",
+			Namespace: namespace,
+			Subsystem: gslbServicesSubsystem,
+			Name:      "responses_total",
+			Help:      "Total number of responses received on this service",
 		},
-		sstateLabels,
+		gslbServicesLabels,
 	)
 
 	gslbServicesTotalRequestBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "gslb_service_total_request_bytes",
-			Help: "Total number of request bytes received on this service",
+			Namespace: namespace,
+			Subsystem: gslbServicesSubsystem,
+			Name:      "request_bytes_total",
+			Help:      "Total number of request bytes received on this service",
 		},
-		sstateLabels,
+		gslbServicesLabels,
 	)
 
 	gslbServicesTotalResponseBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "gslb_service_total_response_bytes",
-			Help: "Total number of response bytes received on this service",
+			Namespace: namespace,
+			Subsystem: gslbServicesSubsystem,
+			Name:      "response_bytes_total",
+			Help:      "Total number of response bytes received on this service",
 		},
-		sstateLabels,
+		gslbServicesLabels,
 	)
 
 	gslbServicesCurrentClientConns = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "gslb_service_current_client_connections",
-			Help: "Number of current client connections",
+			Namespace: namespace,
+			Subsystem: gslbServicesSubsystem,
+			Name:      "current_client_connections",
+			Help:      "Number of current client connections",
 		},
-		sstateLabels,
+		gslbServicesLabels,
 	)
 
 	gslbServicesCurrentServerConns = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "gslb_service_current_server_connections",
-			Help: "Number of current connections to the actual servers",
+			Namespace: namespace,
+			Subsystem: gslbServicesSubsystem,
+			Name:      "current_server_connections",
+			Help:      "Number of current connections to the actual servers",
 		},
-		sstateLabels,
+		gslbServicesLabels,
 	)
 
 	gslbServicesEstablishedConnections = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "gslb_service_established_connections",
-			Help: "Number of server connections in ESTABLISHED state",
+			Namespace: namespace,
+			Subsystem: gslbServicesSubsystem,
+			Name:      "established_connections",
+			Help:      "Number of server connections in ESTABLISHED state",
 		},
-		sstateLabels,
+		gslbServicesLabels,
 	)
 
 	gslbServicesCurrentLoad = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "gslb_service_current_load",
-			Help: "Load on the service that is calculated from the bound load based monitor",
+			Namespace: namespace,
+			Subsystem: gslbServicesSubsystem,
+			Name:      "current_load",
+			Help:      "Load on the service that is calculated from the bound load based monitor",
 		},
-		sstateLabels,
+		gslbServicesLabels,
 	)
 
 	gslbServicesVirtualServerServiceHits = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "gslb_service_virtual_server_service_hits",
-			Help: "Number of times that the service has been provided",
+			Namespace: namespace,
+			Subsystem: gslbServicesSubsystem,
+			Name:      "virtual_server_service_hits_total",
+			Help:      "Number of times that the service has been provided",
 		},
-		sstateLabels,
+		gslbServicesLabels,
 	)
 )
 
@@ -98,10 +120,16 @@ func (e *Exporter) collectGSLBServicesState(ns netscaler.NSAPIResponse) {
 	e.gslbServicesState.Reset()
 
 	for _, service := range ns.GSLBServiceStats {
-		state := 0.0
-
-		if service.State == "UP" {
+		var state float64
+		switch service.State {
+		case `DOWN`:
+			state = 0.0
+		case `UP`:
 			state = 1.0
+		case `OUT OF SERVICE`:
+			state = 2.0
+		default:
+			state = 3.0
 		}
 
 		e.gslbServicesState.WithLabelValues(e.nsInstance, service.Name).Set(state)
@@ -171,6 +199,7 @@ func (e *Exporter) collectGSLBServicesEstablishedConnections(ns netscaler.NSAPIR
 	}
 }
 
+/*
 func (e *Exporter) collectGSLBServicesCurrentLoad(ns netscaler.NSAPIResponse) {
 	e.gslbServicesCurrentLoad.Reset()
 
@@ -188,3 +217,4 @@ func (e *Exporter) collectGSLBServicesVirtualServerServiceHits(ns netscaler.NSAP
 		e.gslbServicesVirtualServerServiceHits.WithLabelValues(e.nsInstance, service.Name).Set(val)
 	}
 }
+*/

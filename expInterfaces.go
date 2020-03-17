@@ -7,67 +7,83 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var interfaceLabels = []string{
+const interfacesSubsystem = "interface"
+
+var interfacesLabels = []string{
 	netscalerInstance,
 	`interface`,
 	`alias`,
 }
 
 var (
-	interfacesRxBytes = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "interfaces_received_bytes",
-			Help: "Number of bytes received by specific interfaces.",
+	interfacesRxBytes = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: interfacesSubsystem,
+			Name:      "received_bytes_total",
+			Help:      "Number of bytes received by specific interfaces.",
 		},
-		interfaceLabels,
+		interfacesLabels,
 	)
 
-	interfacesTxBytes = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "interfaces_transmitted_bytes",
-			Help: "Number of bytes transmitted by specific interfaces.",
+	interfacesTxBytes = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: interfacesSubsystem,
+			Name:      "transmitted_bytes_total",
+			Help:      "Number of bytes transmitted by specific interfaces.",
 		},
-		interfaceLabels,
+		interfacesLabels,
 	)
 
-	interfacesRxPackets = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "interfaces_received_packets",
-			Help: "Number of packets received by specific interfaces",
+	interfacesRxPackets = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: interfacesSubsystem,
+			Name:      "received_packets_total",
+			Help:      "Number of packets received by specific interfaces",
 		},
-		interfaceLabels,
+		interfacesLabels,
 	)
 
-	interfacesTxPackets = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "interfaces_transmitted_packets",
-			Help: "Number of packets transmitted by specific interfaces",
+	interfacesTxPackets = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: interfacesSubsystem,
+			Name:      "transmitted_packets_total",
+			Help:      "Number of packets transmitted by specific interfaces",
 		},
-		interfaceLabels,
+		interfacesLabels,
 	)
 
-	interfacesJumboPacketsRx = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "interfaces_jumbo_packets_received",
-			Help: "Number of bytes received by specific interfaces",
+	interfacesJumboPacketsRx = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: interfacesSubsystem,
+			Name:      "jumbo_packets_received_total",
+			Help:      "Number of bytes received by specific interfaces",
 		},
-		interfaceLabels,
+		interfacesLabels,
 	)
 
-	interfacesJumboPacketsTx = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "interfaces_jumbo_packets_transmitted",
-			Help: "Number of jumbo packets transmitted by specific interfaces",
+	interfacesJumboPacketsTx = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: interfacesSubsystem,
+			Name:      "jumbo_packets_transmitted_total",
+			Help:      "Number of jumbo packets transmitted by specific interfaces",
 		},
-		interfaceLabels,
+		interfacesLabels,
 	)
 
-	interfacesErrorPacketsRx = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "interfaces_error_packets_received",
-			Help: "Number of error packets received by specific interfaces",
+	interfacesErrorPacketsRx = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: namespace,
+			Subsystem: interfacesSubsystem,
+			Name:      "error_packets_received_total",
+			Help:      "Number of error packets received by specific interfaces",
 		},
-		interfaceLabels,
+		interfacesLabels,
 	)
 )
 

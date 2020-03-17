@@ -7,7 +7,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var sgstateLabels = []string{
+const serviceGroupsSubsystem = "servicegroup"
+
+var serviceGroupsLabels = []string{
 	netscalerInstance,
 	`servicegroup`,
 	`member`,
@@ -16,108 +18,138 @@ var sgstateLabels = []string{
 var (
 	serviceGroupsState = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "servicegroup_state",
-			Help: "Current state of the server",
+			Namespace: namespace,
+			Subsystem: serviceGroupsSubsystem,
+			Name:      "state",
+			Help:      "Current state of the server. 0 = DOWN, 1 = UP, 2 = OUT OF SERVICE, 3 = UNKNOWN",
 		},
-		sgstateLabels,
+		serviceGroupsLabels,
 	)
 
 	serviceGroupsAvgTTFB = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "servicegroup_average_time_to_first_byte",
-			Help: "Average TTFB between the NetScaler appliance and the server.",
+			Namespace: namespace,
+			Subsystem: serviceGroupsSubsystem,
+			Name:      "average_time_to_first_byte_seconds",
+			Help:      "Average TTFB between the NetScaler appliance and the server. TTFB is the time interval between sending the request packet to a service and receiving the first response from the service.",
 		},
-		sgstateLabels,
+		serviceGroupsLabels,
 	)
 
 	serviceGroupsTotalRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "servicegroup_total_requests",
-			Help: "Total number of requests received on this service",
+			Namespace: namespace,
+			Subsystem: serviceGroupsSubsystem,
+			Name:      "requests_total",
+			Help:      "Total number of requests received on this service",
 		},
-		sgstateLabels,
+		serviceGroupsLabels,
 	)
 
 	serviceGroupsTotalResponses = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "servicegroup_total_responses",
-			Help: "Number of responses received on this service.",
+			Namespace: namespace,
+			Subsystem: serviceGroupsSubsystem,
+			Name:      "responses_total",
+			Help:      "Number of responses received on this service.",
 		},
-		sgstateLabels,
+		serviceGroupsLabels,
 	)
 
 	serviceGroupsTotalRequestBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "servicegroup_total_request_bytes",
-			Help: "Total number of request bytes received on this service",
+			Namespace: namespace,
+			Subsystem: serviceGroupsSubsystem,
+			Name:      "request_bytes_total",
+			Help:      "Total number of request bytes received on this service",
 		},
-		sgstateLabels,
+		serviceGroupsLabels,
 	)
 
 	serviceGroupsTotalResponseBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "servicegroup_total_response_bytes",
-			Help: "Number of response bytes received by this service",
+			Namespace: namespace,
+			Subsystem: serviceGroupsSubsystem,
+			Name:      "response_bytes_total",
+			Help:      "Number of response bytes received by this service",
 		},
-		sgstateLabels,
+		serviceGroupsLabels,
 	)
 
 	serviceGroupsCurrentClientConnections = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "servicegroup_current_client_connections",
-			Help: "Number of current client connections.",
+			Namespace: namespace,
+			Subsystem: serviceGroupsSubsystem,
+			Name:      "current_client_connections",
+			Help:      "Number of current client connections.",
 		},
-		sgstateLabels,
+		serviceGroupsLabels,
 	)
 
 	serviceGroupsSurgeCount = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "servicegroup_surge_count",
-			Help: "Number of requests in the surge queue.",
+			Namespace: namespace,
+			Subsystem: serviceGroupsSubsystem,
+			Name:      "surge_queue",
+			Help:      "Number of requests in the surge queue.",
 		},
-		sgstateLabels,
+		serviceGroupsLabels,
 	)
 
 	serviceGroupsCurrentServerConnections = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "servicegroup_current_server_connections",
-			Help: "Number of current connections to the actual servers behind the virtual server.",
+			Namespace: namespace,
+			Subsystem: serviceGroupsSubsystem,
+			Name:      "current_server_connections",
+			Help:      "Number of current connections to the actual servers behind the virtual server.",
 		},
-		sgstateLabels,
+		serviceGroupsLabels,
 	)
 
 	serviceGroupsServerEstablishedConnections = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "servicegroup_server_established_connections",
-			Help: "Number of server connections in ESTABLISHED state.",
+			Namespace: namespace,
+			Subsystem: serviceGroupsSubsystem,
+			Name:      "server_established_connections",
+			Help:      "Number of server connections in ESTABLISHED state.",
 		},
-		sgstateLabels,
+		serviceGroupsLabels,
 	)
 
 	serviceGroupsCurrentReusePool = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "servicegroup_current_reuse_pool",
-			Help: "Number of requests in the idle queue/reuse pool.",
+			Namespace: namespace,
+			Subsystem: serviceGroupsSubsystem,
+			Name:      "current_reuse_pool",
+			Help:      "Number of requests in the idle queue/reuse pool.",
 		},
-		sgstateLabels,
+		serviceGroupsLabels,
 	)
 
 	serviceGroupsMaxClients = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "servicegroup_max_clients",
-			Help: "Maximum open connections allowed on this service.",
+			Namespace: namespace,
+			Subsystem: serviceGroupsSubsystem,
+			Name:      "max_clients",
+			Help:      "Maximum open connections allowed on this service.",
 		},
-		sgstateLabels,
+		serviceGroupsLabels,
 	)
 )
 
 func (e *Exporter) collectServiceGroupsState(sg netscaler.ServiceGroupMemberStats, sgName string, servername string) {
 	e.serviceGroupsState.Reset()
 
-	state := 0.0
-
-	if sg.State == "UP" {
+	var state float64
+	switch sg.State {
+	case `DOWN`:
+		state = 0.0
+	case `UP`:
 		state = 1.0
+	case `OUT OF SERVICE`:
+		state = 2.0
+	default:
+		state = 3.0
 	}
 
 	e.serviceGroupsState.WithLabelValues(e.nsInstance, sgName, servername).Set(state)
@@ -126,8 +158,10 @@ func (e *Exporter) collectServiceGroupsState(sg netscaler.ServiceGroupMemberStat
 func (e *Exporter) collectServiceGroupsAvgTTFB(sg netscaler.ServiceGroupMemberStats, sgName string, servername string) {
 	e.serviceGroupsAvgTTFB.Reset()
 
+	var serviceGroupsAvgTTFBInSeconds float64
 	val, _ := strconv.ParseFloat(sg.AvgTimeToFirstByte, 64)
-	e.serviceGroupsAvgTTFB.WithLabelValues(e.nsInstance, sgName, servername).Set(val)
+	serviceGroupsAvgTTFBInSeconds = val * 0.001
+	e.serviceGroupsAvgTTFB.WithLabelValues(e.nsInstance, sgName, servername).Set(serviceGroupsAvgTTFBInSeconds)
 }
 
 func (e *Exporter) collectServiceGroupsTotalRequests(sg netscaler.ServiceGroupMemberStats, sgName string, servername string) {
