@@ -1,11 +1,11 @@
 package netscaler
 
 import (
+	"crypto/tls"
 	"net/http"
 	"net/http/cookiejar"
 	"strings"
 	"time"
-	"crypto/tls"
 
 	"github.com/pkg/errors"
 )
@@ -35,7 +35,7 @@ func NewNitroClient(url string, username string, password string, ignoreCert boo
 	}
 
 	c.client = &http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: 60 * time.Second,
 		Jar:     jar,
 	}
 

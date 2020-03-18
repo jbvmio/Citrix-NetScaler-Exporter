@@ -3,7 +3,8 @@ package main
 import (
 	"strconv"
 
-	"github.com/jbvmio/citrix-netscaler-exporter/netscaler"
+	"citrix-netscaler-exporter/netscaler"
+
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -12,6 +13,7 @@ const servicesSubsystem = "service"
 var servicesLabels = []string{
 	netscalerInstance,
 	`citrixadc_service_name`,
+	`vip`,
 }
 
 var (
@@ -185,7 +187,7 @@ func (e *Exporter) collectServicesThroughput(ns netscaler.NSAPIResponse) {
 		val, _ := strconv.ParseFloat(service.Throughput, 64)
 		// Value is in megabytes. Convert to base unit of bytes
 		throughputInBytes = val * 1024 * 1024
-		e.servicesThroughput.WithLabelValues(e.nsInstance, service.Name).Set(throughputInBytes)
+		e.servicesThroughput.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(throughputInBytes)
 	}
 }
 
@@ -196,7 +198,7 @@ func (e *Exporter) collectServicesAvgTTFB(ns netscaler.NSAPIResponse) {
 		var servicesAvgTTFBInSeconds float64
 		val, _ := strconv.ParseFloat(service.AvgTimeToFirstByte, 64)
 		servicesAvgTTFBInSeconds = val * 0.001
-		e.servicesAvgTTFB.WithLabelValues(e.nsInstance, service.Name).Set(servicesAvgTTFBInSeconds)
+		e.servicesAvgTTFB.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(servicesAvgTTFBInSeconds)
 	}
 }
 
@@ -215,7 +217,7 @@ func (e *Exporter) collectServicesState(ns netscaler.NSAPIResponse) {
 		default:
 			state = 3.0
 		}
-		e.servicesState.WithLabelValues(e.nsInstance, service.Name).Set(state)
+		e.servicesState.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(state)
 	}
 }
 
@@ -224,7 +226,7 @@ func (e *Exporter) collectServicesTotalRequests(ns netscaler.NSAPIResponse) {
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.TotalRequests, 64)
-		e.servicesTotalRequests.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesTotalRequests.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }
 
@@ -233,7 +235,7 @@ func (e *Exporter) collectServicesTotalResponses(ns netscaler.NSAPIResponse) {
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.TotalResponses, 64)
-		e.servicesTotalResponses.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesTotalResponses.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }
 
@@ -242,7 +244,7 @@ func (e *Exporter) collectServicesTotalRequestBytes(ns netscaler.NSAPIResponse) 
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.TotalRequestBytes, 64)
-		e.servicesTotalRequestBytes.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesTotalRequestBytes.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }
 
@@ -251,7 +253,7 @@ func (e *Exporter) collectServicesTotalResponseBytes(ns netscaler.NSAPIResponse)
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.TotalResponseBytes, 64)
-		e.servicesTotalResponseBytes.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesTotalResponseBytes.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }
 
@@ -260,7 +262,7 @@ func (e *Exporter) collectServicesCurrentClientConns(ns netscaler.NSAPIResponse)
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.CurrentClientConnections, 64)
-		e.servicesCurrentClientConns.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesCurrentClientConns.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }
 
@@ -269,7 +271,7 @@ func (e *Exporter) collectServicesSurgeCount(ns netscaler.NSAPIResponse) {
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.SurgeCount, 64)
-		e.servicesSurgeCount.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesSurgeCount.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }
 
@@ -278,7 +280,7 @@ func (e *Exporter) collectServicesCurrentServerConns(ns netscaler.NSAPIResponse)
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.CurrentServerConnections, 64)
-		e.servicesCurrentServerConns.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesCurrentServerConns.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }
 
@@ -287,7 +289,7 @@ func (e *Exporter) collectServicesServerEstablishedConnections(ns netscaler.NSAP
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.ServerEstablishedConnections, 64)
-		e.servicesServerEstablishedConnections.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesServerEstablishedConnections.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }
 
@@ -296,7 +298,7 @@ func (e *Exporter) collectServicesCurrentReusePool(ns netscaler.NSAPIResponse) {
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.CurrentReusePool, 64)
-		e.servicesCurrentReusePool.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesCurrentReusePool.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }
 
@@ -305,7 +307,7 @@ func (e *Exporter) collectServicesMaxClients(ns netscaler.NSAPIResponse) {
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.MaxClients, 64)
-		e.servicesMaxClients.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesMaxClients.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }
 
@@ -315,7 +317,7 @@ func (e *Exporter) collectServicesCurrentLoad(ns netscaler.NSAPIResponse) {
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.CurrentLoad, 64)
-		e.servicesCurrentLoad.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesCurrentLoad.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }
 
@@ -324,7 +326,7 @@ func (e *Exporter) collectServicesVirtualServerServiceHits(ns netscaler.NSAPIRes
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.ServiceHits, 64)
-		e.servicesVirtualServerServiceHits.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesVirtualServerServiceHits.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }
 */
@@ -334,6 +336,6 @@ func (e *Exporter) collectServicesActiveTransactions(ns netscaler.NSAPIResponse)
 
 	for _, service := range ns.ServiceStats {
 		val, _ := strconv.ParseFloat(service.ActiveTransactions, 64)
-		e.servicesActiveTransactions.WithLabelValues(e.nsInstance, service.Name).Set(val)
+		e.servicesActiveTransactions.WithLabelValues(e.nsInstance, service.Name, getValue(vipDB.db, service.Name)).Set(val)
 	}
 }

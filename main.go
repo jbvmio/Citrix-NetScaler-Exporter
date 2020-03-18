@@ -25,8 +25,8 @@ var (
 	versionFlg = flag.Bool("version", false, "Display application version")
 	debugFlg   = flag.Bool("debug", false, "Enable debug logging?")
 	logger     log.Logger
-
 	nsInstance string
+	vipDB      *DB
 )
 
 func init() {
@@ -46,6 +46,9 @@ func main() {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
+
+	vipDB = newDB(dbDir)
+	go vipDB.collectAll()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>
@@ -85,6 +88,7 @@ func main() {
 	level.Info(logger).Log("msg", "Listening on port "+listeningPort)
 
 	err := http.ListenAndServe(listeningPort, nil)
+	vipDB.stopCollect()
 	if err != nil {
 		level.Error(logger).Log("msg", err)
 		os.Exit(1)
@@ -109,6 +113,29 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	if *debugFlg {
 		level.Debug(logger).Log("msg", "scraping target", "target", target)
+	}
+
+	there, ready := vipDB.exists(target)
+	switch {
+	case !there:
+		level.Info(logger).Log("msg", "creating new vip mappings for "+target)
+		lbs := lbserver{
+			url:    target,
+			user:   *username,
+			pass:   *password,
+			ignore: ignoreCertCheck,
+		}
+		vipDB.setLBServer(lbs)
+		err := vipDB.collectVIPMap(lbs)
+		if err != nil {
+			http.Error(w, "Error creating new vip mappings: "+err.Error(), 400)
+			level.Error(logger).Log("msg", err)
+			return
+		}
+	case !ready:
+		w.WriteHeader(http.StatusOK)
+		level.Info(logger).Log("msg", "vip mappings not ready yet for "+target)
+		return
 	}
 
 	exporter, err := NewExporter(target, *username, *password, ignoreCertCheck, logger, nsInstance)

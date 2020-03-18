@@ -10,6 +10,7 @@ import (
 
 const (
 	netscalerInstance = `citrixadc_instance`
+	dbDir             = `./badger`
 )
 
 // Exporter represents the metrics exported to Prometheus
@@ -61,7 +62,7 @@ type Exporter struct {
 	servicesCurrentReusePool               *prometheus.GaugeVec
 	servicesMaxClients                     *prometheus.GaugeVec
 	//servicesCurrentLoad                    *prometheus.GaugeVec
-	//servicesVirtualServerServiceHits                    *prometheus.CounterVec
+	//servicesVirtualServerServiceHits       *prometheus.CounterVec
 	servicesActiveTransactions                *prometheus.GaugeVec
 	serviceGroupsState                        *prometheus.GaugeVec
 	serviceGroupsAvgTTFB                      *prometheus.GaugeVec
@@ -83,7 +84,7 @@ type Exporter struct {
 	gslbServicesCurrentClientConns            *prometheus.GaugeVec
 	gslbServicesCurrentServerConns            *prometheus.GaugeVec
 	//gslbServicesCurrentLoad                   *prometheus.GaugeVec
-	//gslbServicesVirtualServerServiceHits                *prometheus.CounterVec
+	//gslbServicesVirtualServerServiceHits		*prometheus.CounterVec
 	gslbServicesEstablishedConnections                  *prometheus.GaugeVec
 	gslbVirtualServersHealth                            *prometheus.GaugeVec
 	gslbVirtualServersInactiveServices                  *prometheus.GaugeVec
@@ -238,7 +239,6 @@ func NewExporter(url string, username string, password string, ignoreCert bool, 
 		csVirtualServersNumberInvalidRequestResponse:        csVirtualServersNumberInvalidRequestResponse,
 		csVirtualServersNumberInvalidRequestResponseDropped: csVirtualServersNumberInvalidRequestResponseDropped,
 		csVirtualServersTotalVServerDownBackupHits:          csVirtualServersTotalVServerDownBackupHits,
-
 		//csVirtualServersCurrentMultipathSessions:            csVirtualServersCurrentMultipathSessions,
 		//csVirtualServersCurrentMultipathSubflows:            csVirtualServersCurrentMultipathSubflows,
 		vpnVirtualServersTotalRequests:      vpnVirtualServersTotalRequests,
@@ -361,7 +361,6 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	e.csVirtualServersNumberInvalidRequestResponse.Describe(ch)
 	e.csVirtualServersNumberInvalidRequestResponseDropped.Describe(ch)
 	e.csVirtualServersTotalVServerDownBackupHits.Describe(ch)
-
 	//e.csVirtualServersCurrentMultipathSessions.Describe(ch)
 	//e.csVirtualServersCurrentMultipathSubflows.Describe(ch)
 
