@@ -11,7 +11,7 @@ import (
 	"github.com/dgraph-io/badger"
 )
 
-const intervalSecs = 120
+const intervalSecs = 300
 
 // DB handles vip mappings.
 type DB struct {
@@ -90,7 +90,7 @@ func (db *DB) copy() map[string]lbserver {
 
 func (db *DB) collectAll() {
 	log.Printf("starting vip mapping process ...\n")
-	ticker := time.NewTicker(time.Minute * intervalSecs)
+	ticker := time.NewTicker(time.Second * intervalSecs)
 collectLoop:
 	for {
 		select {

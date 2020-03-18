@@ -392,41 +392,42 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 
 		for _, s := range stats.ServiceGroups[0].ServiceGroupMembers {
 			servicegroupnameParts := strings.Split(s.ServiceGroupName, "?")
+			mem := servicegroupnameParts[1] + `:` + servicegroupnameParts[2]
 
-			e.collectServiceGroupsState(s, sg.Name, servicegroupnameParts[1])
+			e.collectServiceGroupsState(s, sg.Name, mem)
 			e.serviceGroupsState.Collect(ch)
 
-			e.collectServiceGroupsAvgTTFB(s, sg.Name, servicegroupnameParts[1])
+			e.collectServiceGroupsAvgTTFB(s, sg.Name, mem)
 			e.serviceGroupsAvgTTFB.Collect(ch)
 
-			e.collectServiceGroupsTotalRequests(s, sg.Name, servicegroupnameParts[1])
+			e.collectServiceGroupsTotalRequests(s, sg.Name, mem)
 			e.serviceGroupsTotalRequests.Collect(ch)
 
-			e.collectServiceGroupsTotalResponses(s, sg.Name, servicegroupnameParts[1])
+			e.collectServiceGroupsTotalResponses(s, sg.Name, mem)
 			e.serviceGroupsTotalResponses.Collect(ch)
 
-			e.collectServiceGroupsTotalRequestBytes(s, sg.Name, servicegroupnameParts[1])
+			e.collectServiceGroupsTotalRequestBytes(s, sg.Name, mem)
 			e.serviceGroupsTotalRequestBytes.Collect(ch)
 
-			e.collectServiceGroupsTotalResponseBytes(s, sg.Name, servicegroupnameParts[1])
+			e.collectServiceGroupsTotalResponseBytes(s, sg.Name, mem)
 			e.serviceGroupsTotalResponseBytes.Collect(ch)
 
-			e.collectServiceGroupsCurrentClientConnections(s, sg.Name, servicegroupnameParts[1])
+			e.collectServiceGroupsCurrentClientConnections(s, sg.Name, mem)
 			e.serviceGroupsCurrentClientConnections.Collect(ch)
 
-			e.collectServiceGroupsSurgeCount(s, sg.Name, servicegroupnameParts[1])
+			e.collectServiceGroupsSurgeCount(s, sg.Name, mem)
 			e.serviceGroupsSurgeCount.Collect(ch)
 
-			e.collectServiceGroupsCurrentServerConnections(s, sg.Name, servicegroupnameParts[1])
+			e.collectServiceGroupsCurrentServerConnections(s, sg.Name, mem)
 			e.serviceGroupsCurrentServerConnections.Collect(ch)
 
-			e.collectServiceGroupsServerEstablishedConnections(s, sg.Name, servicegroupnameParts[1])
+			e.collectServiceGroupsServerEstablishedConnections(s, sg.Name, mem)
 			e.serviceGroupsServerEstablishedConnections.Collect(ch)
 
-			e.collectServiceGroupsCurrentReusePool(s, sg.Name, servicegroupnameParts[1])
+			e.collectServiceGroupsCurrentReusePool(s, sg.Name, mem)
 			e.serviceGroupsCurrentReusePool.Collect(ch)
 
-			e.collectServiceGroupsMaxClients(s, sg.Name, servicegroupnameParts[1])
+			e.collectServiceGroupsMaxClients(s, sg.Name, mem)
 			e.serviceGroupsMaxClients.Collect(ch)
 		}
 	}
