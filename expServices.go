@@ -13,7 +13,7 @@ const servicesSubsystem = "service"
 var servicesLabels = []string{
 	netscalerInstance,
 	`citrixadc_service_name`,
-	`vip`,
+	`citrixadc_lb_name`,
 }
 
 var (
