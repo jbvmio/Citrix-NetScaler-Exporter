@@ -12,8 +12,8 @@ const serviceGroupsSubsystem = "servicegroup"
 
 var serviceGroupsLabels = []string{
 	netscalerInstance,
-	`servicegroup`,
-	`member`,
+	`citrixadc_servicegroup_name`,
+	`citrixadc_servicegroup_member`,
 }
 
 var (
