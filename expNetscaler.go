@@ -51,16 +51,16 @@ var (
 		nil,
 	)
 
-	totRxMB = prometheus.NewDesc(
-		prometheus.BuildFQName(namespace, netscalerSubsystem, "total_received_mb"),
-		"Total number of Megabytes received by the NetScaler appliance",
+	totRxBytes = prometheus.NewDesc(
+		prometheus.BuildFQName(namespace, netscalerSubsystem, "received_bytes_total"),
+		"Total number of bytes received by the NetScaler appliance",
 		netscalerLabels,
 		nil,
 	)
 
-	totTxMB = prometheus.NewDesc(
-		prometheus.BuildFQName(namespace, netscalerSubsystem, "total_transmit_mb"),
-		"Total number of Megabytes transmitted by the NetScaler appliance",
+	totTxBytes = prometheus.NewDesc(
+		prometheus.BuildFQName(namespace, netscalerSubsystem, "transmitted_bytes_total"),
+		"Total number of bytes transmitted by the NetScaler appliance",
 		netscalerLabels,
 		nil,
 	)

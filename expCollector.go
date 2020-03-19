@@ -76,7 +76,9 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	fltModelID, _ := strconv.ParseFloat(nslicense.NSLicense.ModelID, 64)
 
 	fltTotRxMB, _ := strconv.ParseFloat(ns.NSStats.TotalReceivedMB, 64)
+	fltTotRxBytes := fltTotRxMB * 1024 * 1024
 	fltTotTxMB, _ := strconv.ParseFloat(ns.NSStats.TotalTransmitMB, 64)
+	fltTotTxBytes := fltTotTxMB * 1024 * 1024
 	fltHTTPRequests, _ := strconv.ParseFloat(ns.NSStats.HTTPRequests, 64)
 	fltHTTPResponses, _ := strconv.ParseFloat(ns.NSStats.HTTPResponses, 64)
 
@@ -110,19 +112,19 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		totRxMB, prometheus.GaugeValue, fltTotRxMB, e.nsInstance,
+		totRxBytes, prometheus.CounterValue, fltTotRxBytes, e.nsInstance,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		totTxMB, prometheus.GaugeValue, fltTotTxMB, e.nsInstance,
+		totTxBytes, prometheus.CounterValue, fltTotTxBytes, e.nsInstance,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		httpRequests, prometheus.GaugeValue, fltHTTPRequests, e.nsInstance,
+		httpRequests, prometheus.CounterValue, fltHTTPRequests, e.nsInstance,
 	)
 
 	ch <- prometheus.MustNewConstMetric(
-		httpResponses, prometheus.GaugeValue, fltHTTPResponses, e.nsInstance,
+		httpResponses, prometheus.CounterValue, fltHTTPResponses, e.nsInstance,
 	)
 
 	ch <- prometheus.MustNewConstMetric(

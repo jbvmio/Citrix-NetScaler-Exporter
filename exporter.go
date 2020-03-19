@@ -21,8 +21,8 @@ type Exporter struct {
 	pktCPUUsage                            *prometheus.Desc
 	flashPartitionUsage                    *prometheus.Desc
 	varPartitionUsage                      *prometheus.Desc
-	totRxMB                                *prometheus.Desc
-	totTxMB                                *prometheus.Desc
+	totRxBytes                             *prometheus.Desc
+	totTxBytes                             *prometheus.Desc
 	httpRequests                           *prometheus.Desc
 	httpResponses                          *prometheus.Desc
 	tcpCurrentClientConnections            *prometheus.Desc
@@ -148,8 +148,8 @@ func NewExporter(url string, username string, password string, ignoreCert bool, 
 		pktCPUUsage:                            pktCPUUsage,
 		flashPartitionUsage:                    flashPartitionUsage,
 		varPartitionUsage:                      varPartitionUsage,
-		totRxMB:                                totRxMB,
-		totTxMB:                                totTxMB,
+		totRxBytes:                             totRxBytes,
+		totTxBytes:                             totTxBytes,
 		httpRequests:                           httpRequests,
 		httpResponses:                          httpResponses,
 		tcpCurrentClientConnections:            tcpCurrentClientConnections,
@@ -263,8 +263,8 @@ func (e *Exporter) Describe(ch chan<- *prometheus.Desc) {
 	ch <- pktCPUUsage
 	ch <- flashPartitionUsage
 	ch <- varPartitionUsage
-	ch <- totRxMB
-	ch <- totTxMB
+	ch <- totRxBytes
+	ch <- totTxBytes
 	ch <- httpResponses
 	ch <- httpRequests
 	ch <- tcpCurrentClientConnections
