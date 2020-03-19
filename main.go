@@ -126,12 +126,15 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			ignore: ignoreCertCheck,
 		}
 		vipDB.setLBServer(lbs)
-		err := vipDB.collectVIPMap(lbs)
-		if err != nil {
-			http.Error(w, "Error creating new vip mappings: "+err.Error(), 400)
-			level.Error(logger).Log("msg", err)
-			return
-		}
+		go func() {
+			err := vipDB.collectVIPMap(lbs)
+			if err != nil {
+				level.Error(logger).Log("msg", "error creating new vip mappings: "+err.Error())
+				return
+			}
+		}()
+		w.WriteHeader(http.StatusOK)
+		level.Info(logger).Log("msg", "vip mappings not ready yet for "+target)
 	case !ready:
 		w.WriteHeader(http.StatusOK)
 		level.Info(logger).Log("msg", "vip mappings not ready yet for "+target)

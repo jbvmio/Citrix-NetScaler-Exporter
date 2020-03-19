@@ -1,12 +1,13 @@
 package main
 
 import (
-	"citrix-netscaler-exporter/netscaler"
 	"fmt"
 	"log"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/jbvmio/netscaler"
 
 	"github.com/dgraph-io/badger"
 )
@@ -129,6 +130,7 @@ func (db *DB) collectVIPMaps(wg *sync.WaitGroup) {
 }
 
 func (db *DB) collectVIPMap(lbs lbserver) error {
+	log.Printf("starting update for %s\n", lbs.url)
 	nsClient, err := netscaler.NewNitroClient(lbs.url, lbs.user, lbs.pass, lbs.ignore)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error creating ns client: %v\n", err)
@@ -150,18 +152,18 @@ func (db *DB) collectVIPMap(lbs lbserver) error {
 		fmt.Fprintf(os.Stderr, "error collecting bindings: %v\n", err)
 		return err
 	}
+	kvMap := make(map[string]string)
 	for _, b := range nsBindings.LBVServerServiceBindings {
-		errd := updateDB(db.db, []byte(b.ServiceName), []byte(b.Name))
-		if errd != nil {
-			fmt.Fprintf(os.Stderr, "error updating bindings for %s: %v\n", b.ServiceName, errd)
-			err = errd
-		}
+		kvMap[b.ServiceName] = b.Name
 	}
+	err = updateBatch(db.db, kvMap)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error updating 1 or more bindings: %v\n", err)
+		fmt.Fprintf(os.Stderr, "error updating 1 or more bindings\n")
+		log.Printf("failed update for %s\n", lbs.url)
 	} else {
 		lbs.ready = true
 		db.setLBServer(lbs)
+		log.Printf("successful update for %s\n", lbs.url)
 	}
 	return err
 }
@@ -195,7 +197,18 @@ func getValue(db *badger.DB, key string) string {
 func updateDB(db *badger.DB, key, value []byte) error {
 	return db.Update(func(txn *badger.Txn) error {
 		e := badger.NewEntry(key, value)
-		//fmt.Fprintf(os.Stderr, "setting value for key %s: %s\n", key, value)
 		return txn.SetEntry(e)
 	})
+}
+
+func updateBatch(db *badger.DB, kv map[string]string) error {
+	wb := db.NewWriteBatch()
+	defer wb.Cancel()
+	for k, v := range kv {
+		err := wb.Set([]byte(k), []byte(v))
+		if err != nil {
+			log.Printf("failed to set key: %s\n", k)
+		}
+	}
+	return wb.Flush()
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"strconv"
 
-	"citrix-netscaler-exporter/netscaler"
+	"github.com/jbvmio/netscaler"
 
 	"github.com/prometheus/client_golang/prometheus"
 )

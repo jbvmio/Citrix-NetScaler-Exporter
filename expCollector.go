@@ -3,8 +3,9 @@ package main
 import (
 	"strconv"
 	"strings"
+	"sync"
 
-	"citrix-netscaler-exporter/netscaler"
+	"github.com/jbvmio/netscaler"
 
 	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
@@ -386,53 +387,67 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 		level.Error(e.logger).Log("msg", err)
 	}
 
+	wg := sync.WaitGroup{}
+	controlChan := make(chan bool, 100)
+	var count int
 	for _, sg := range servicegroups.ServiceGroups {
-		stats, err2 := netscaler.GetServiceGroupMemberStats(nsClient, sg.Name)
-		if err2 != nil {
-			level.Error(e.logger).Log("msg", err2)
-		}
+		wg.Add(1)
+		controlChan <- false
+		go func(w *sync.WaitGroup, sgn string, c int) {
+			defer w.Done()
+			stats, err2 := netscaler.GetServiceGroupMemberStats(nsClient, sgn)
+			if err2 != nil {
+				level.Error(e.logger).Log("msg", err2)
+			}
+			for _, s := range stats.ServiceGroups[0].ServiceGroupMembers {
+				go func(SG netscaler.ServiceGroupMemberStats) {
+					servicegroupnameParts := strings.Split(SG.ServiceGroupName, "?")
+					mem := servicegroupnameParts[1] + `:` + servicegroupnameParts[2]
 
-		for _, s := range stats.ServiceGroups[0].ServiceGroupMembers {
-			servicegroupnameParts := strings.Split(s.ServiceGroupName, "?")
-			mem := servicegroupnameParts[1] + `:` + servicegroupnameParts[2]
+					e.collectServiceGroupsState(SG, sgn, mem)
+					e.serviceGroupsState.Collect(ch)
 
-			e.collectServiceGroupsState(s, sg.Name, mem)
-			e.serviceGroupsState.Collect(ch)
+					e.collectServiceGroupsAvgTTFB(SG, sgn, mem)
+					e.serviceGroupsAvgTTFB.Collect(ch)
 
-			e.collectServiceGroupsAvgTTFB(s, sg.Name, mem)
-			e.serviceGroupsAvgTTFB.Collect(ch)
+					e.collectServiceGroupsTotalRequests(SG, sgn, mem)
+					e.serviceGroupsTotalRequests.Collect(ch)
 
-			e.collectServiceGroupsTotalRequests(s, sg.Name, mem)
-			e.serviceGroupsTotalRequests.Collect(ch)
+					e.collectServiceGroupsTotalResponses(SG, sgn, mem)
+					e.serviceGroupsTotalResponses.Collect(ch)
 
-			e.collectServiceGroupsTotalResponses(s, sg.Name, mem)
-			e.serviceGroupsTotalResponses.Collect(ch)
+					e.collectServiceGroupsTotalRequestBytes(SG, sgn, mem)
+					e.serviceGroupsTotalRequestBytes.Collect(ch)
 
-			e.collectServiceGroupsTotalRequestBytes(s, sg.Name, mem)
-			e.serviceGroupsTotalRequestBytes.Collect(ch)
+					e.collectServiceGroupsTotalResponseBytes(SG, sgn, mem)
+					e.serviceGroupsTotalResponseBytes.Collect(ch)
 
-			e.collectServiceGroupsTotalResponseBytes(s, sg.Name, mem)
-			e.serviceGroupsTotalResponseBytes.Collect(ch)
+					e.collectServiceGroupsCurrentClientConnections(SG, sgn, mem)
+					e.serviceGroupsCurrentClientConnections.Collect(ch)
 
-			e.collectServiceGroupsCurrentClientConnections(s, sg.Name, mem)
-			e.serviceGroupsCurrentClientConnections.Collect(ch)
+					e.collectServiceGroupsSurgeCount(SG, sgn, mem)
+					e.serviceGroupsSurgeCount.Collect(ch)
 
-			e.collectServiceGroupsSurgeCount(s, sg.Name, mem)
-			e.serviceGroupsSurgeCount.Collect(ch)
+					e.collectServiceGroupsCurrentServerConnections(SG, sgn, mem)
+					e.serviceGroupsCurrentServerConnections.Collect(ch)
 
-			e.collectServiceGroupsCurrentServerConnections(s, sg.Name, mem)
-			e.serviceGroupsCurrentServerConnections.Collect(ch)
+					e.collectServiceGroupsServerEstablishedConnections(SG, sgn, mem)
+					e.serviceGroupsServerEstablishedConnections.Collect(ch)
 
-			e.collectServiceGroupsServerEstablishedConnections(s, sg.Name, mem)
-			e.serviceGroupsServerEstablishedConnections.Collect(ch)
+					e.collectServiceGroupsCurrentReusePool(SG, sgn, mem)
+					e.serviceGroupsCurrentReusePool.Collect(ch)
 
-			e.collectServiceGroupsCurrentReusePool(s, sg.Name, mem)
-			e.serviceGroupsCurrentReusePool.Collect(ch)
+					e.collectServiceGroupsMaxClients(SG, sgn, mem)
+					e.serviceGroupsMaxClients.Collect(ch)
+				}(s)
+			}
 
-			e.collectServiceGroupsMaxClients(s, sg.Name, mem)
-			e.serviceGroupsMaxClients.Collect(ch)
-		}
+			<-controlChan
+
+		}(&wg, sg.Name, count)
+
 	}
+	wg.Wait()
 
 	err = netscaler.Disconnect(nsClient)
 	if err != nil {

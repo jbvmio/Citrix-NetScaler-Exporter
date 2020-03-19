@@ -3,7 +3,6 @@ module github.com/jbvmio/citrix-netScaler-exporter
 go 1.12
 
 require (
-	citrix-netscaler-exporter/netscaler v0.0.0-00010101000000-000000000000
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/dgraph-io/badger v1.6.0
 	github.com/go-kit/kit v0.9.0
@@ -11,6 +10,7 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/google/go-cmp v0.4.0 // indirect
+	github.com/jbvmio/netscaler v0.0.0-20200319171531-d7d00bc2b2fc
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/prometheus/client_golang v0.8.0
@@ -22,5 +22,3 @@ require (
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.2.5 // indirect
 )
-
-replace citrix-netscaler-exporter/netscaler => ./netscaler
