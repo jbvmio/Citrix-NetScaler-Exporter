@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -16,17 +17,18 @@ import (
 )
 
 var (
-	app        = "Citrix-NetScaler-Exporter"
-	version    string
-	build      string
-	username   = flag.String("username", "", "Username with which to connect to the NetScaler API")
-	password   = flag.String("password", "", "Password with which to connect to the NetScaler API")
-	bindPort   = flag.Int("bind_port", 9280, "Port to bind the exporter endpoint to")
-	versionFlg = flag.Bool("version", false, "Display application version")
-	debugFlg   = flag.Bool("debug", false, "Enable debug logging?")
-	logger     log.Logger
-	nsInstance string
-	vipDB      *DB
+	app          = "Citrix-NetScaler-Exporter"
+	version      string
+	build        string
+	username     = flag.String("username", "", "Username with which to connect to the NetScaler API")
+	password     = flag.String("password", "", "Password with which to connect to the NetScaler API")
+	localMapping = flag.String("mapping", "./mappings.yaml", "Load local mappings file")
+	bindPort     = flag.Int("bind_port", 9280, "Port to bind the exporter endpoint to")
+	versionFlg   = flag.Bool("version", false, "Display application version")
+	debugFlg     = flag.Bool("debug", false, "Enable debug logging?")
+	logger       log.Logger
+	nsInstance   string
+	vipDB        *DB
 )
 
 func init() {
@@ -47,7 +49,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	currentMapping = VIPMap{
+		mappings: make(map[string]map[string]string),
+		lock:     sync.Mutex{},
+	}
+
+	currentMapping.loadMappingYaml(*localMapping)
+
 	vipDB = newDB(dbDir)
+	vipDB.loadVIPMap(&currentMapping)
 	go vipDB.collectAll()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -83,6 +93,7 @@ func main() {
 
 	http.HandleFunc("/netscaler", handler)
 	http.Handle("/metrics", promhttp.Handler())
+	http.HandleFunc("/mapping", handleMapping)
 
 	listeningPort := ":" + strconv.Itoa(*bindPort)
 	level.Info(logger).Log("msg", "Listening on port "+listeningPort)
@@ -116,6 +127,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	there, ready := vipDB.exists(target)
+	loaded := currentMapping.exists(target)
 	switch {
 	case !there:
 		level.Info(logger).Log("msg", "creating new vip mappings for "+target)
@@ -125,20 +137,23 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			pass:   *password,
 			ignore: ignoreCertCheck,
 		}
-		vipDB.setLBServer(lbs)
-		go func() {
-			err := vipDB.collectVIPMap(lbs)
+		if loaded {
+			vipDB.setLBServer(lbs)
+		} else {
+			vipDB.setLBServer(lbs)
+			err := vipDB.collectVIPMap2(lbs)
 			if err != nil {
 				level.Error(logger).Log("msg", "error creating new vip mappings: "+err.Error())
+				vipDB.removeLBServer(lbs)
 				return
 			}
-		}()
-		w.WriteHeader(http.StatusOK)
-		level.Info(logger).Log("msg", "vip mappings not ready yet for "+target)
+		}
 	case !ready:
-		w.WriteHeader(http.StatusOK)
-		level.Info(logger).Log("msg", "vip mappings not ready yet for "+target)
-		return
+		if !loaded {
+			w.WriteHeader(http.StatusOK)
+			level.Info(logger).Log("msg", "vip mappings not ready yet for "+target)
+			return
+		}
 	}
 
 	exporter, err := NewExporter(target, *username, *password, ignoreCertCheck, logger, nsInstance)
@@ -154,4 +169,15 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	// Delegate http serving to Prometheus client library, which will call Collect.
 	h := promhttp.HandlerFor(registry, promhttp.HandlerOpts{})
 	h.ServeHTTP(w, r)
+}
+
+func handleMapping(w http.ResponseWriter, r *http.Request) {
+	maps, err := currentMapping.getMappingYaml()
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(maps)
 }

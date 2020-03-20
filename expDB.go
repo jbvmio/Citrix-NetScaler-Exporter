@@ -2,17 +2,21 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/jbvmio/netscaler"
+	"gopkg.in/yaml.v2"
 
 	"github.com/dgraph-io/badger"
 )
 
-const intervalSecs = 300
+const intervalSecs = 3600
+
+var currentMapping VIPMap
 
 // DB handles vip mappings.
 type DB struct {
@@ -78,6 +82,12 @@ func (db *DB) setLBServer(lbs lbserver) {
 	db.lock.Unlock()
 }
 
+func (db *DB) removeLBServer(lbs lbserver) {
+	db.lock.Lock()
+	delete(db.lbservers, lbs.url)
+	db.lock.Unlock()
+}
+
 func (db *DB) copy() map[string]lbserver {
 	var tmp map[string]lbserver
 	db.lock.Lock()
@@ -122,14 +132,14 @@ func (db *DB) collectVIPMaps(wg *sync.WaitGroup) {
 		mappings := db.copy()
 		for url, lbs := range mappings {
 			log.Printf("updating vip mappings for %s\n", url)
-			db.collectVIPMap(lbs)
+			db.collectVIPMap2(lbs)
 			log.Printf("completed vip mappings for %s\n", url)
 		}
 		db.setNotCollecting()
 	}
 }
 
-func (db *DB) collectVIPMap(lbs lbserver) error {
+func (db *DB) collectVIPMap2(lbs lbserver) error {
 	log.Printf("starting update for %s\n", lbs.url)
 	nsClient, err := netscaler.NewNitroClient(lbs.url, lbs.user, lbs.pass, lbs.ignore)
 	if err != nil {
@@ -156,16 +166,94 @@ func (db *DB) collectVIPMap(lbs lbserver) error {
 	for _, b := range nsBindings.LBVServerServiceBindings {
 		kvMap[b.ServiceName] = b.Name
 	}
-	err = updateBatch(db.db, kvMap)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error updating 1 or more bindings\n")
-		log.Printf("failed update for %s\n", lbs.url)
-	} else {
-		lbs.ready = true
-		db.setLBServer(lbs)
-		log.Printf("successful update for %s\n", lbs.url)
+	currentMapping.updateMappings(lbs.url, kvMap)
+	/*
+		err = updateBatch(db.db, kvMap)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error updating 1 or more bindings\n")
+			log.Printf("failed update for %s\n", lbs.url)
+		} else {
+			lbs.ready = true
+			db.setLBServer(lbs)
+			log.Printf("successful update for %s\n", lbs.url)
+		}
+	*/
+	return nil
+}
+
+func (db *DB) loadVIPMap(vMap *VIPMap) {
+	kvMap := make(map[string]string)
+	vMap.lock.Lock()
+	for _, k := range vMap.mappings {
+		for a, b := range k {
+			kvMap[a] = b
+		}
 	}
-	return err
+	vMap.lock.Unlock()
+	err := updateBatch(db.db, kvMap)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error updating 1 or more bindings from file\n")
+		log.Printf("error updating 1 or more bindings from file\n")
+	}
+}
+
+// VIPMap contains mappings.
+type VIPMap struct {
+	mappings map[string]map[string]string
+	lock     sync.Mutex
+}
+
+func (v *VIPMap) updateMappings(key string, maps map[string]string) {
+	v.lock.Lock()
+	ab, there := v.mappings[key]
+	if !there {
+		v.mappings[key] = make(map[string]string)
+		ab = v.mappings[key]
+	}
+	for a, b := range maps {
+		ab[a] = b
+	}
+	v.lock.Unlock()
+}
+
+func (v *VIPMap) exists(key string) bool {
+	var there bool
+	v.lock.Lock()
+	_, there = v.mappings[key]
+	v.lock.Unlock()
+	return there
+}
+
+func (v *VIPMap) getMapping(url, key string) string {
+	var val string
+	v.lock.Lock()
+	val = v.mappings[url][key]
+	v.lock.Unlock()
+	return val
+}
+
+func (v *VIPMap) getMappingYaml() (y []byte, err error) {
+	v.lock.Lock()
+	y, err = yaml.Marshal(v.mappings)
+	v.lock.Unlock()
+	return
+}
+
+func (v *VIPMap) loadMappingYaml(path string) bool {
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Println("error loading mapping file:", err)
+		return false
+	}
+	err = yaml.Unmarshal(b, &v.mappings)
+	if err != nil {
+		log.Println("error unmarshaling mapping file:", err)
+		return false
+	}
+	if len(v.mappings) > 0 {
+		return true
+	}
+	return false
 }
 
 type lbserver struct {
@@ -187,7 +275,6 @@ func getValue(db *badger.DB, key string) string {
 			val = []byte{}
 		} else {
 			val, _ = item.ValueCopy(nil)
-			//fmt.Printf("%s: NOT NIL: %v\n", key, val)
 		}
 		return nil
 	})

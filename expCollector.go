@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"strconv"
 	"strings"
 	"sync"
@@ -11,7 +12,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-const namespace = "citrixadc"
+const (
+	namespace   = "citrixadc"
+	controlSize = 50
+)
 
 // Collect is initiated by the Prometheus handler and gathers the metrics
 func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
@@ -388,65 +392,72 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	wg := sync.WaitGroup{}
-	controlChan := make(chan bool, 100)
+	control := int(math.Round((float64(len(servicegroups.ServiceGroups)) / controlSize) + 0.6))
+	if control <= 1 {
+		control = len(servicegroups.ServiceGroups)
+	}
 	var count int
-	for _, sg := range servicegroups.ServiceGroups {
+	for count < len(servicegroups.ServiceGroups) {
+		begin := count
+		end := count + control
+		if end > len(servicegroups.ServiceGroups) {
+			end = len(servicegroups.ServiceGroups)
+		}
+		svcGroups := servicegroups.ServiceGroups[begin:end]
+		count = end
 		wg.Add(1)
-		controlChan <- false
-		go func(w *sync.WaitGroup, sgn string, c int) {
+		go func(groups []netscaler.ServiceGroups, w *sync.WaitGroup) {
 			defer w.Done()
-			stats, err2 := netscaler.GetServiceGroupMemberStats(nsClient, sgn)
-			if err2 != nil {
-				level.Error(e.logger).Log("msg", err2)
-			}
-			for _, s := range stats.ServiceGroups[0].ServiceGroupMembers {
-				go func(SG netscaler.ServiceGroupMemberStats) {
-					servicegroupnameParts := strings.Split(SG.ServiceGroupName, "?")
+			for _, sg := range groups {
+				stats, err2 := netscaler.GetServiceGroupMemberStats(nsClient, sg.Name)
+				if err2 != nil {
+					level.Error(e.logger).Log("msg", err2)
+				}
+				for _, s := range stats.ServiceGroups[0].ServiceGroupMembers {
+					servicegroupnameParts := strings.Split(s.ServiceGroupName, "?")
 					mem := servicegroupnameParts[1] + `:` + servicegroupnameParts[2]
 
-					e.collectServiceGroupsState(SG, sgn, mem)
+					e.collectServiceGroupsState(s, sg.Name, mem)
 					e.serviceGroupsState.Collect(ch)
 
-					e.collectServiceGroupsAvgTTFB(SG, sgn, mem)
+					e.collectServiceGroupsAvgTTFB(s, sg.Name, mem)
 					e.serviceGroupsAvgTTFB.Collect(ch)
 
-					e.collectServiceGroupsTotalRequests(SG, sgn, mem)
+					e.collectServiceGroupsTotalRequests(s, sg.Name, mem)
 					e.serviceGroupsTotalRequests.Collect(ch)
 
-					e.collectServiceGroupsTotalResponses(SG, sgn, mem)
+					e.collectServiceGroupsTotalResponses(s, sg.Name, mem)
 					e.serviceGroupsTotalResponses.Collect(ch)
 
-					e.collectServiceGroupsTotalRequestBytes(SG, sgn, mem)
+					e.collectServiceGroupsTotalRequestBytes(s, sg.Name, mem)
 					e.serviceGroupsTotalRequestBytes.Collect(ch)
 
-					e.collectServiceGroupsTotalResponseBytes(SG, sgn, mem)
+					e.collectServiceGroupsTotalResponseBytes(s, sg.Name, mem)
 					e.serviceGroupsTotalResponseBytes.Collect(ch)
 
-					e.collectServiceGroupsCurrentClientConnections(SG, sgn, mem)
+					e.collectServiceGroupsCurrentClientConnections(s, sg.Name, mem)
 					e.serviceGroupsCurrentClientConnections.Collect(ch)
 
-					e.collectServiceGroupsSurgeCount(SG, sgn, mem)
+					e.collectServiceGroupsSurgeCount(s, sg.Name, mem)
 					e.serviceGroupsSurgeCount.Collect(ch)
 
-					e.collectServiceGroupsCurrentServerConnections(SG, sgn, mem)
+					e.collectServiceGroupsCurrentServerConnections(s, sg.Name, mem)
 					e.serviceGroupsCurrentServerConnections.Collect(ch)
 
-					e.collectServiceGroupsServerEstablishedConnections(SG, sgn, mem)
+					e.collectServiceGroupsServerEstablishedConnections(s, sg.Name, mem)
 					e.serviceGroupsServerEstablishedConnections.Collect(ch)
 
-					e.collectServiceGroupsCurrentReusePool(SG, sgn, mem)
+					e.collectServiceGroupsCurrentReusePool(s, sg.Name, mem)
 					e.serviceGroupsCurrentReusePool.Collect(ch)
 
-					e.collectServiceGroupsMaxClients(SG, sgn, mem)
+					e.collectServiceGroupsMaxClients(s, sg.Name, mem)
 					e.serviceGroupsMaxClients.Collect(ch)
-				}(s)
+
+				}
 			}
-
-			<-controlChan
-
-		}(&wg, sg.Name, count)
-
+		}(svcGroups, &wg)
 	}
+
 	wg.Wait()
 
 	err = netscaler.Disconnect(nsClient)
